@@ -1,0 +1,6 @@
+*.html linguist-vendored
+*.html linguist-detectable=false
+*.kt linguist-language=Kotlin
+*.kts linguist-language=Kotlin
+build/** linguist-vendored
+target/** linguist-vendored
