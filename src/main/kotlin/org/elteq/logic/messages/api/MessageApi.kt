@@ -2,6 +2,7 @@ package org.elteq.logic.messages.api
 
 import io.quarkus.security.Authenticated
 import jakarta.validation.Valid
+import jakarta.websocket.server.ServerEndpoint
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response

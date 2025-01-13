@@ -11,3 +11,15 @@ class PhoneNumberValidator : ConstraintValidator<ValidPhoneNumber, String> {
         return PhoneNumberUtils.isValid(phoneNumber)
     }
 }
+
+
+@Singleton
+class ArrayPhoneNumberValidator : ConstraintValidator<ValidateArrayPhoneNumber, MutableSet<String>> {
+    override fun isValid(phoneNumbers: MutableSet<String>, context: ConstraintValidatorContext): Boolean {
+        if (phoneNumbers.isEmpty()) return false
+
+        return phoneNumbers.parallelStream().allMatch { phoneNumber ->
+            PhoneNumberUtils.isValid(phoneNumber)
+        }
+    }
+}

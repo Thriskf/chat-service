@@ -14,3 +14,13 @@ annotation class ValidPhoneNumber(
     val groups: Array<KClass<*>> = [],
     val payload: Array<KClass<out Payload>> = [],
 )
+
+@Target(AnnotationTarget.FIELD)
+@Retention(AnnotationRetention.RUNTIME)
+@Constraint(validatedBy = [ArrayPhoneNumberValidator::class])
+@MustBeDocumented
+annotation class ValidateArrayPhoneNumber(
+    val message: String = "Invalid phone number",
+    val groups: Array<KClass<*>> = [],
+    val payload: Array<KClass<out Payload>> = [],
+)

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull
 import kotlinx.serialization.Serializable
 import org.elteq.base.validators.ValidPhoneNumber
 import org.elteq.logic.dob.models.DoBDTO
+import org.elteq.logic.users.enums.Gender
 
 @Serializable
 data class UserAddDTO(
@@ -14,6 +15,9 @@ data class UserAddDTO(
 
     @NotBlank
     var lastName: String? = null,
+
+    @NotBlank
+    var gender: Gender? = null,
 
     @NotBlank
     var otherName: String? = null,

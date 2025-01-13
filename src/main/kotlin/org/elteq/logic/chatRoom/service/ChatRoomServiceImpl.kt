@@ -32,7 +32,7 @@ class ServiceImpl(@Inject var repo: ChatRoomRepository) : ChatRoomService {
         val users = mutableSetOf<Users>()
 
         dto.phoneNumbers?.parallelStream()?.forEach {
-            val user = userService.getByContact(it.phoneNumber!!)
+            val user = userService.getByContact(it)
             users.add(user)
         }
         ent.user = users

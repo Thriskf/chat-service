@@ -44,7 +44,7 @@ class Users : PanacheEntityBase(), Serializable {
     //    @JsonIgnore
 //    @JsonbTransient
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_id", nullable = false)
+    @JoinColumn(name = "room_id")
     var chatRoom: ChatRoom? = null
 
     @JsonIgnore
