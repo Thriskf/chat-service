@@ -8,6 +8,7 @@ import jakarta.ws.rs.core.Response
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.elteq.base.apiResponse.domain.ApiResponse
+import org.elteq.logic.messages.spec.MessageSpec
 import java.util.*
 
 @Path("/api/v1/message")
@@ -22,11 +23,11 @@ interface MessageApi {
     fun add(@Valid dto: Any): ApiResponse<Any>
 
     @GET
-    @Path("/{wardId}")
-    fun getById(@PathParam("wardId") wardId: UUID): ApiResponse<Any>
+    @Path("/{id}")
+    fun getById(@PathParam("id") id: UUID): ApiResponse<Any>
 
     @GET
-    fun search(@BeanParam spec: Any): ApiResponse<List<Any>>
+    fun search(@BeanParam spec: MessageSpec): ApiResponse<List<Any>>
 
     @PUT
     fun addInCharge(dto: Any): ApiResponse<Any>

@@ -13,8 +13,8 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-<!--        <quarkus.platform.version>3.0.3.Final</quarkus.platform.version>-->
-        <quarkus.platform.version>3.2.9.Final</quarkus.platform.version>
+        <quarkus.version>3.2.9.Final</quarkus.version>
+<!--        <quarkus.version>3.2.9.Final</quarkus.version>-->
         <skipITs>true</skipITs>
         <surefire-plugin.version>3.1.2</surefire-plugin.version>
         <kotlin.version>2.0.0</kotlin.version>
@@ -27,7 +27,7 @@
             <dependency>
                 <groupId>${quarkus.platform.group-id}</groupId>
                 <artifactId>${quarkus.platform.artifact-id}</artifactId>
-                <version>${quarkus.platform.version}</version>
+                <version>${quarkus.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -36,15 +36,20 @@
     <dependencies>
 <!--        <dependency>-->
 <!--            <groupId>io.quarkus</groupId>-->
+<!--            <artifactId>quarkus-security</artifactId>-->
+<!--            <version>${quarkus.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>io.quarkus</groupId>-->
 <!--            <artifactId>quarkus-core</artifactId>-->
-<!--            <version>${quarkus.platform.version}</version>-->
-<!--            <scope>provided</scope>-->
-<!--&lt;!&ndash;            <exclusions>&ndash;&gt;-->
-<!--&lt;!&ndash;                <exclusion>&ndash;&gt;-->
-<!--&lt;!&ndash;                    <groupId>net.bytebuddy</groupId>&ndash;&gt;-->
-<!--&lt;!&ndash;                    <artifactId>byte-buddy</artifactId>&ndash;&gt;-->
-<!--&lt;!&ndash;                </exclusion>&ndash;&gt;-->
-<!--&lt;!&ndash;            </exclusions>&ndash;&gt;-->
+<!--            <version>${quarkus.version}</version>-->
+<!--&lt;!&ndash;            <scope>provided</scope>&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;            <exclusions>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                <exclusion>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                    <groupId>net.bytebuddy</groupId>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                    <artifactId>byte-buddy</artifactId>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                </exclusion>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;            </exclusions>&ndash;&gt;&ndash;&gt;-->
 <!--        </dependency>-->
 
         <!--        <dependency>-->
@@ -64,11 +69,11 @@
 <!--            <artifactId>quarkus-flyway</artifactId>-->
 <!--        </dependency>-->
 
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-websockets-next</artifactId>
-            <version>3.13.0</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.quarkus</groupId>-->
+<!--            <artifactId>quarkus-websockets-next</artifactId>-->
+<!--            <version>3.10.1</version>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>org.liquibase</groupId>
@@ -103,7 +108,7 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-vertx</artifactId>
-            <version>${quarkus.platform.version}</version>
+            <version>${quarkus.version}</version>
         </dependency>
 
         <!-- Jackson's library to convert kotlin classes and data classes -->
@@ -154,7 +159,7 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-hibernate-orm-panache</artifactId>
-            <version>${quarkus.platform.version}</version>
+            <version>${quarkus.version}</version>
         </dependency>
 
         <dependency>
@@ -166,24 +171,24 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-resteasy-reactive</artifactId>
-            <version>${quarkus.platform.version}</version>
+            <version>${quarkus.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-keycloak-authorization</artifactId>
-            <version>${quarkus.platform.version}</version>
+            <version>${quarkus.version}</version>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-keycloak-admin-client-reactive</artifactId>
-            <version>${quarkus.platform.version}</version>
+            <version>${quarkus.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-jdbc-mariadb</artifactId>
-            <version>${quarkus.platform.version}</version>
+            <version>${quarkus.version}</version>
         </dependency>
 
         <!--        <dependency>-->
@@ -193,38 +198,44 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-resteasy-reactive-jsonb</artifactId>
-            <version>${quarkus.platform.version}</version>
+            <version>${quarkus.version}</version>
         </dependency>
 
 <!--        <dependency>-->
 <!--            <groupId>io.quarkus</groupId>-->
 <!--            <artifactId>quarkus-resteasy-reactive-jaxb</artifactId>-->
-<!--            <version>${quarkus.platform.version}</version>-->
+<!--            <version>${quarkus.version}</version>-->
 <!--        </dependency>-->
 
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-smallrye-openapi</artifactId>
-            <version>${quarkus.platform.version}</version>
+            <version>${quarkus.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-smallrye-health</artifactId>
-            <version>${quarkus.platform.version}</version>
+            <version>${quarkus.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-smallrye-reactive-messaging-rabbitmq</artifactId>
-            <version>${quarkus.platform.version}</version>
+            <version>${quarkus.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-kafka-client</artifactId>
-            <version>${quarkus.platform.version}</version>
+            <artifactId>quarkus-smallrye-reactive-messaging-kafka</artifactId>
+            <version>${quarkus.version}</version>
         </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>io.quarkus</groupId>-->
+<!--            <artifactId>quarkus-kafka-client</artifactId>-->
+<!--            <version>${quarkus.version}</version>-->
+<!--        </dependency>-->
         <!--        <dependency>-->
         <!--            <groupId>io.quarkus</groupId>-->
         <!--            <artifactId>quarkus-kafka-streams</artifactId>-->
@@ -232,29 +243,29 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-smallrye-reactive-messaging</artifactId>
-            <version>${quarkus.platform.version}</version>
+            <version>${quarkus.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-kotlin</artifactId>
-            <version>${quarkus.platform.version}</version>
+            <version>${quarkus.version}</version>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-rest-client-reactive-jackson</artifactId>
-            <version>${quarkus.platform.version}</version>
+            <version>${quarkus.version}</version>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-resteasy-reactive-jackson</artifactId>
-            <version>${quarkus.platform.version}</version>
+            <version>${quarkus.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-redis-client</artifactId>
-            <version>${quarkus.platform.version}</version>
+            <version>${quarkus.version}</version>
         </dependency>
 
 
@@ -267,7 +278,7 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-arc</artifactId>
-            <version>${quarkus.platform.version}</version>
+            <version>${quarkus.version}</version>
         </dependency>
 
         <dependency>
@@ -301,7 +312,7 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-hibernate-validator</artifactId>
-            <version>${quarkus.platform.version}</version>
+            <version>${quarkus.version}</version>
         </dependency>
 
         <dependency>
@@ -364,7 +375,7 @@
             <plugin>
                 <groupId>${quarkus.platform.group-id}</groupId>
                 <artifactId>quarkus-maven-plugin</artifactId>
-                <version>${quarkus.platform.version}</version>
+                <version>${quarkus.version}</version>
                 <extensions>true</extensions>
                 <executions>
                     <execution>

@@ -19,7 +19,7 @@ import java.util.*
 @Table(
     name = "tbl_dob",
     indexes = [
-        Index(name = "index_patient_id", columnList = "patient_id" ),
+        Index(name = "index_user_id", columnList = "user_id" ),
     ]
 )
 class DOB : PanacheEntityBase(), Serializable {
@@ -45,7 +45,7 @@ class DOB : PanacheEntityBase(), Serializable {
     @JsonIgnore
     @JsonbTransient
     @OneToOne(cascade = [CascadeType.ALL], fetch = FetchType.EAGER, orphanRemoval = true)
-//    @JoinColumn(,name = "patient_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     var user: Users? = null
 
     @CreationTimestamp

@@ -3,6 +3,7 @@ package org.elteq.logic.messages.api
 import jakarta.transaction.Transactional
 import jakarta.ws.rs.core.Response
 import org.elteq.base.apiResponse.domain.ApiResponse
+import org.elteq.logic.messages.spec.MessageSpec
 import java.util.*
 
 @Transactional
@@ -11,11 +12,11 @@ class MessageApiImpl: MessageApi {
         TODO("Not yet implemented")
     }
 
-    override fun getById(wardId: UUID): ApiResponse<Any> {
+    override fun getById(id: UUID): ApiResponse<Any> {
         TODO("Not yet implemented")
     }
 
-    override fun search(spec: Any): ApiResponse<List<Any>> {
+    override fun search(spec: MessageSpec): ApiResponse<List<Any>> {
         TODO("Not yet implemented")
     }
 
