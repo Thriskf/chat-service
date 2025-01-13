@@ -16,5 +16,6 @@ interface ChatRoomService {
     fun delete(id: UUID): String
     fun deleteAll(): String
     fun count(): Long
+    fun getByRoomIdAndUserId(roomId: UUID, userId: UUID): ChatRoom?
 
 }

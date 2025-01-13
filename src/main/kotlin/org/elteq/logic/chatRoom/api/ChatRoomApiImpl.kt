@@ -62,6 +62,7 @@ class ChatRoomApiImpl(@Inject var service: ChatRoomService) : ChatRoomApi {
             val dtos = ents.stream<ChatRoom>().map {
                 modelMapper.map(it, ChatRoomDTO::class.java)
             }
+            logger.info("chat room DTOs $dtos")
             val response = wrapInApiResponse(dtos.toList())
             logger.info("filtered chatroom with $spec: $response")
             return response

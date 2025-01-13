@@ -28,14 +28,14 @@ class Messages : PanacheEntityBase(), Serializable {
 
     @JsonIgnore
     @JsonbTransient
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "room_id", nullable = false)
     var chatRoom: ChatRoom? = null
 
     @Column(name = "message")
     var message: String? = null
 
-    @ManyToOne(cascade = [ALL], fetch = FetchType.LAZY)
+    @ManyToOne(cascade = [ALL], fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     var user: Users? = null
 
@@ -48,6 +48,6 @@ class Messages : PanacheEntityBase(), Serializable {
     var updatedOn: LocalDateTime? = null
 
     override fun toString(): String {
-        return "Messages(id=$id, chatRoom=$chatRoom, message=$message, user=$user, createdOn=$createdOn, updatedOn=$updatedOn)"
+        return "Messages(id=$id, createdOn=$createdOn, updatedOn=$updatedOn)"
     }
 }

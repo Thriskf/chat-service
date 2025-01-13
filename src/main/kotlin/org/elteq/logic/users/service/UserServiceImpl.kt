@@ -53,6 +53,7 @@ class UserServiceImpl(@Inject var repo: UserRepository) : UserService {
             lastName = dto.lastName
             otherName = dto.otherName
             displayName = dto.displayName
+            gender = dto.gender
         }
 
         ent.dateOfBirth = dto.dateOfBirth?.let {

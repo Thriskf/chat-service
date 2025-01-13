@@ -225,17 +225,17 @@
             <version>${quarkus.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-smallrye-reactive-messaging-rabbitmq</artifactId>
-            <version>${quarkus.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.quarkus</groupId>-->
+<!--            <artifactId>quarkus-smallrye-reactive-messaging-rabbitmq</artifactId>-->
+<!--            <version>${quarkus.version}</version>-->
+<!--        </dependency>-->
 
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-smallrye-reactive-messaging-kafka</artifactId>
-            <version>${quarkus.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.quarkus</groupId>-->
+<!--            <artifactId>quarkus-smallrye-reactive-messaging-kafka</artifactId>-->
+<!--            <version>${quarkus.version}</version>-->
+<!--        </dependency>-->
 
 <!--        <dependency>-->
 <!--            <groupId>io.quarkus</groupId>-->

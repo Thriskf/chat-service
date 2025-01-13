@@ -28,10 +28,10 @@ class ChatRoom : PanacheEntityBase(), Serializable {
 
     @JsonIgnore
     @JsonbTransient
-    @OneToMany(mappedBy = "chatRoom", cascade = [ALL], fetch = FetchType.LAZY)
-    var user:MutableSet<Users>?= mutableSetOf()
+    @OneToMany(mappedBy = "chatRoom", cascade = [ALL], fetch = FetchType.EAGER)
+    var users:MutableSet<Users>?= mutableSetOf()
 
-    @OneToMany(mappedBy = "chatRoom", cascade = [ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "chatRoom", cascade = [ALL], fetch = FetchType.EAGER, orphanRemoval = true)
     var messages:MutableSet<Messages>?= mutableSetOf()
 
     @CreationTimestamp
@@ -43,7 +43,7 @@ class ChatRoom : PanacheEntityBase(), Serializable {
     var updatedOn: LocalDateTime? = null
 
     override fun toString(): String {
-        return "ChatRoom(id=$id, user=$user, messages=$messages, createdOn=$createdOn, updatedOn=$updatedOn)"
+        return "ChatRoom(id=$id, createdOn=$createdOn, updatedOn=$updatedOn)"
     }
 
 

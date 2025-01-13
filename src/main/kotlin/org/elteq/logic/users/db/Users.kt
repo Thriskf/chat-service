@@ -2,6 +2,7 @@ package org.elteq.logic.users.db
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase
+import jakarta.json.bind.annotation.JsonbTransient
 import jakarta.persistence.*
 import jakarta.persistence.CascadeType.ALL
 import org.elteq.logic.chatRoom.db.ChatRoom
@@ -41,16 +42,17 @@ class Users : PanacheEntityBase(), Serializable {
     @Column(name = "display_name")
     var displayName: String? = null
 
-    //    @JsonIgnore
-//    @JsonbTransient
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_id")
+    @JsonIgnore
+    @JsonbTransient
+    @ManyToOne(fetch = FetchType.EAGER, cascade = [ALL])
     var chatRoom: ChatRoom? = null
 
     @JsonIgnore
+    @JsonbTransient
     @OneToMany(mappedBy = "user", cascade = [ALL], fetch = FetchType.LAZY)
 //    @JoinColumn(name = "us", referencedColumnName = "id")
-    var message: MutableSet<Messages>? = mutableSetOf()
+    var messages: MutableSet<Messages>? = mutableSetOf()
+
 
     @OneToMany(mappedBy = "user", cascade = [ALL], fetch = FetchType.EAGER, targetEntity = Contact::class, orphanRemoval = true)
     var contacts: Set<Contact>? = setOf()

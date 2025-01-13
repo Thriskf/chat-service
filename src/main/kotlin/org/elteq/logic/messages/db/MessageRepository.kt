@@ -1,8 +1,10 @@
 package org.elteq.logic.messages.db
 
+import io.quarkus.hibernate.orm.panache.PanacheQuery
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase
 import jakarta.enterprise.context.ApplicationScoped
 import org.elteq.base.utils.PaginatedQuery
+import org.elteq.logic.messages.spec.MessageSpec
 import java.util.*
 
 
@@ -20,8 +22,18 @@ class MessageRepository : PanacheRepositoryBase<Messages, UUID> {
         return find("phoneNumber", phoneNumber).firstResult()
     }
 
-//    fun all(spec: Any, operation: String = "and"): PanacheQuery<Any> {
-//        if (spec.sortBy == "createdOn") spec.sortBy = "createdOn"
-//        return paginatedQuery.toQuery(spec, operation, this)
-//    }
+    fun finByUserId(userId: UUID): PanacheQuery<Messages> {
+        return find(
+            """
+        SELECT m FROM Messages m
+        JOIN m.user u
+        AND u.id = :userId
+        """, userId
+        )
+
+    }
+
+    fun all(spec: MessageSpec, operation: String = "and"): PanacheQuery<Messages> {
+        return paginatedQuery.toQuery(spec, operation, this)
+    }
 }
