@@ -29,7 +29,7 @@ WORKDIR /build
 # Copy the application source code, configuration, and application properties
 COPY src ./src
 COPY pom.xml ./pom.xml
-COPY src/main/resources/application-prod.properties src/main/resources/application.properties
+COPY src/main/resources/prod-application.properties src/main/resources/application.properties
 
 # Build the application JAR
 ARG ARTIFACT_ID=chat-service
