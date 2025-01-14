@@ -28,7 +28,7 @@ import java.util.*
 class Users : PanacheEntityBase(), Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    var id: UUID? = null
+    var id: String? = null
 
     @Column(name = "first_name", nullable = false)
     var firstName: String? = null
@@ -44,8 +44,8 @@ class Users : PanacheEntityBase(), Serializable {
 
     @JsonIgnore
     @JsonbTransient
-    @ManyToOne(fetch = FetchType.EAGER, cascade = [ALL])
-    var chatRoom: ChatRoom? = null
+    @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY, cascade = [ALL])
+    var chatRooms: MutableSet<ChatRoom>? = mutableSetOf()
 
     @JsonIgnore
     @JsonbTransient
@@ -57,9 +57,9 @@ class Users : PanacheEntityBase(), Serializable {
     @OneToMany(mappedBy = "user", cascade = [ALL], fetch = FetchType.EAGER, targetEntity = Contact::class, orphanRemoval = true)
     var contacts: Set<Contact>? = setOf()
 
-    @OneToOne(mappedBy = "user", cascade = [ALL], fetch = FetchType.EAGER, orphanRemoval = true)
-    @JoinColumn(name = "date_of_birth_id", referencedColumnName = "id") // Foreign key column
-    var dateOfBirth: DOB? = null
+//    @OneToOne(mappedBy = "user", cascade = [ALL], fetch = FetchType.EAGER, orphanRemoval = true)
+//    @JoinColumn(name = "date_of_birth_id", referencedColumnName = "id") // Foreign key column
+//    var dateOfBirth: DOB? = null
 
     @Column(name = "gender")
     @Enumerated(EnumType.STRING)

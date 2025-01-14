@@ -34,7 +34,7 @@ class ChatRoomServiceImpl(@Inject var repo: ChatRoomRepository) : ChatRoomServic
 
         dto.phoneNumbers?.parallelStream()?.forEach {
             val user = userService.getByContact(it)
-            user.chatRoom = ent
+            user.chatRooms?.add(ent)
             users.add(user)
         }
         ent.users = users
@@ -44,7 +44,7 @@ class ChatRoomServiceImpl(@Inject var repo: ChatRoomRepository) : ChatRoomServic
         return ent
     }
 
-    override fun getById(id: UUID): ChatRoom? {
+    override fun getById(id: String): ChatRoom? {
         return repo.findById(id) ?:throw ServiceException("No user found with id '$id'")
     }
 
@@ -67,7 +67,7 @@ class ChatRoomServiceImpl(@Inject var repo: ChatRoomRepository) : ChatRoomServic
         return repo.all(spec)
     }
 
-    override fun delete(id: UUID): String {
+    override fun delete(id: String): String {
         val ent = getById(id)
         repo.delete(ent)
         return "Chat room with id '$id' deleted."
@@ -82,7 +82,7 @@ class ChatRoomServiceImpl(@Inject var repo: ChatRoomRepository) : ChatRoomServic
         return repo.count()
     }
 
-    override fun getByRoomIdAndUserId(roomId: UUID, userId: UUID): ChatRoom? {
+    override fun getByRoomIdAndUserId(roomId: String, userId: String): ChatRoom? {
         logger.error("about to get chat room by roomId: $roomId and userId: $userId")
 //        return repo.findByRoomIdAndUserId(roomId, userId) ?: throw NoSuchElementException("No chat room found")
         return repo.findByRoomIdAndUserId(roomId, userId)

@@ -25,7 +25,7 @@ import java.util.*
 class DOB : PanacheEntityBase(), Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    var id: UUID? = null
+    var id: String? = null
 
     @NotNull
     @Column(name = "day")

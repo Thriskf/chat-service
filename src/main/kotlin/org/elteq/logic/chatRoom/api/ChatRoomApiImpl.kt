@@ -38,7 +38,7 @@ class ChatRoomApiImpl(@Inject var service: ChatRoomService) : ChatRoomApi {
         }
     }
 
-    override fun getById(id: UUID): ApiResponse<ChatRoomDTO> {
+    override fun getById(id: String): ApiResponse<ChatRoomDTO> {
         logger.info("get chat room with id: $id")
         try {
             val ent = service.getById(id)
@@ -77,7 +77,7 @@ class ChatRoomApiImpl(@Inject var service: ChatRoomService) : ChatRoomApi {
     }
 
 
-    override fun delete(id: UUID): ApiResponse<String> {
+    override fun delete(id: String): ApiResponse<String> {
         logger.info("delete chatroom with id: $id")
         try {
             val ent = service.delete(id)

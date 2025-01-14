@@ -36,7 +36,7 @@ class MessageApiImpl(@Inject var service: MessageService) : MessageApi {
         }
     }
 
-    override fun getById(id: UUID): ApiResponse<MessageDTO> {
+    override fun getById(id: String): ApiResponse<MessageDTO> {
         logger.info("getting message with id $id")
         try {
             val ent = service.getById(id)
@@ -71,7 +71,7 @@ class MessageApiImpl(@Inject var service: MessageService) : MessageApi {
         }
     }
 
-    override fun getByUser(userId: UUID): ApiResponse<List<MessageDTO>> {
+    override fun getByUser(userId: String): ApiResponse<List<MessageDTO>> {
         logger.info("getting messages with user id $userId")
         try {
             val ents = service.getByUser(userId)
@@ -93,7 +93,7 @@ class MessageApiImpl(@Inject var service: MessageService) : MessageApi {
 
     }
 
-    override fun delete(id: UUID): Response {
+    override fun delete(id: String): Response {
         logger.info("Deleting message with id: $id")
         try {
             val ent = service.delete(id)

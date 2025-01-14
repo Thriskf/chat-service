@@ -7,6 +7,6 @@ import java.util.*
 @Serializable
 data class ChatRoomAddMessageDTO (
     @NotBlank
-    var id: UUID? = null,
+    var id: String? = null,
     var message: String? = null,
     )

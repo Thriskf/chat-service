@@ -8,7 +8,7 @@ import java.util.*
 @Serializable
 data class MessageUpdateDTO (
     @NotBlank
-    var id: UUID? = null,
+    var id: String? = null,
 
     @Email
     var message: String? = null,

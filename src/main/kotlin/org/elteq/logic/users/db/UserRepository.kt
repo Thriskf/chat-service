@@ -5,11 +5,10 @@ import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase
 import jakarta.enterprise.context.ApplicationScoped
 import org.elteq.base.utils.PaginatedQuery
 import org.elteq.logic.users.spec.UserSpec
-import java.util.*
 
 
 @ApplicationScoped
-class UserRepository : PanacheRepositoryBase<Users, UUID> {
+class UserRepository : PanacheRepositoryBase<Users, String> {
 
     private val paginatedQuery: PaginatedQuery = PaginatedQuery()
 
@@ -19,7 +18,7 @@ class UserRepository : PanacheRepositoryBase<Users, UUID> {
 //        return find("contacts.value = ?1", contact).firstResult()
     }
 
-    fun findByRoomId(id: UUID): PanacheQuery<Users> {
+    fun findByRoomId(id: String): PanacheQuery<Users> {
         return find("chatRoom.id", id)
     }
 

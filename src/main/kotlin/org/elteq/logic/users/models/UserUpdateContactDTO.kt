@@ -9,7 +9,7 @@ import java.util.*
 @Serializable
 data class UserUpdateContactDTO(
     @NotBlank
-    var id: UUID? = null,
+    var id: String? = null,
 
     @Email
     var email: String? = null,

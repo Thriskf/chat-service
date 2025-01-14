@@ -67,7 +67,7 @@ class UserApiImpl(@Inject var service: UserService) : UserApi {
         }
     }
 
-    override fun getById(id: UUID): ApiResponse<UserDTO> {
+    override fun getById(id: String): ApiResponse<UserDTO> {
         logger.info("Getting user by id: $id")
         try {
             val ent = service.getById(id)
@@ -115,7 +115,7 @@ class UserApiImpl(@Inject var service: UserService) : UserApi {
         }
     }
 
-    override fun delete(id: UUID): ApiResponse<String> {
+    override fun delete(id: String): ApiResponse<String> {
         logger.info("Deleting user with id: $id")
         try {
             val result = service.delete(id)

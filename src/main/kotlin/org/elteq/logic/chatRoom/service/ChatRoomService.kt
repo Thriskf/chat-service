@@ -6,16 +6,15 @@ import org.elteq.logic.chatRoom.db.ChatRoom
 import org.elteq.logic.chatRoom.models.ChatRoomAddDTO
 import org.elteq.logic.chatRoom.models.ChatRoomAddMessageDTO
 import org.elteq.logic.chatRoom.spec.ChatRoomSpec
-import java.util.*
 
 interface ChatRoomService {
     fun add(dto: ChatRoomAddDTO): ChatRoom
-    fun getById(id: UUID): ChatRoom?
+    fun getById(id: String): ChatRoom?
     fun addMessage(dto: ChatRoomAddMessageDTO): ChatRoom?
     fun all(spec: ChatRoomSpec): PanacheQuery<ChatRoom>
-    fun delete(id: UUID): String
+    fun delete(id: String): String
     fun deleteAll(): String
     fun count(): Long
-    fun getByRoomIdAndUserId(roomId: UUID, userId: UUID): ChatRoom?
+    fun getByRoomIdAndUserId(roomId: String, userId: String): ChatRoom?
 
 }

@@ -37,9 +37,7 @@ class ChatMessageImpl : ChatMessage {
     override fun onOpen(session: Session, @PathParam("roomId") roomId: String, @PathParam("userId") userId: String) {
         logger.info("user $userId wants to join chat $roomId")
 
-        val userID = UUID.fromString(userId)
-        val roomID = UUID.fromString(roomId)
-        logger.info("getting chat room with id $roomID and user with id $userID")
+        logger.info("getting chat room with id $roomId and user with id $userId")
 //        val room = chatRoomService.getByRoomIdAndUserId(userID, roomID)
 //        logger.info("got chat room with id $roomID and user with id $userID\nCHATROOM :: $room")
 //
@@ -59,7 +57,7 @@ class ChatMessageImpl : ChatMessage {
 //        logger.info("user $userId joined chat $roomId")
 
         Uni.createFrom().item {
-            chatRoomService.getByRoomIdAndUserId(roomID, userID)// Blocking operation
+            chatRoomService.getByRoomIdAndUserId(roomId, userId)// Blocking operation
         }.runSubscriptionOn(Infrastructure.getDefaultExecutor())
             .subscribe().with({ room ->
                 logger.info("got CHATROOM :: $room")
@@ -108,9 +106,9 @@ class ChatMessageImpl : ChatMessage {
         broadcast("$userId: $message")
 
         CompletableFuture.runAsync {
-            val userID = UUID.fromString(userId)
-            val roomID = UUID.fromString(roomId)
-            val msg = messageService.add(message, roomID, userID)
+//            val userID = UUID.fromString(userId)
+//            val roomID = UUID.fromString(roomId)
+            val msg = messageService.add(message, roomId, userId)
             logger.info("persisted message: $msg")
         }
     }

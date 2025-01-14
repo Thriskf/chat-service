@@ -14,7 +14,6 @@ import org.elteq.logic.messages.spec.MessageSpec
 import org.elteq.logic.users.service.UserService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.*
 
 @ApplicationScoped
 @Transactional
@@ -39,7 +38,7 @@ class MessageServiceImpl(@Inject var repo: MessageRepository) : MessageService {
         return ent
     }
 
-    override fun add(msg: String, roomId: UUID, userId: UUID): Messages {
+    override fun add(msg: String, roomId: String, userId: String): Messages {
         logger.info("Adding new message: $msg with roomId: $roomId")
         val room = chatRoomService.getById(roomId)
         val sender = userService.getById(userId)
@@ -61,7 +60,7 @@ class MessageServiceImpl(@Inject var repo: MessageRepository) : MessageService {
         return ent
     }
 
-    override fun getById(id: UUID): Messages? {
+    override fun getById(id: String): Messages? {
         logger.info("Getting message with id: $id")
 //        return repo.findById(id) ?: throw NoSuchElementException("Message with id '$id' not found.")
         return repo.findById(id)
@@ -76,13 +75,13 @@ class MessageServiceImpl(@Inject var repo: MessageRepository) : MessageService {
         return repo.all(spec)
     }
 
-    override fun getByUser(userId: UUID): PanacheQuery<Messages> {
+    override fun getByUser(userId: String): PanacheQuery<Messages> {
         logger.info("Getting messages for user with id: $userId")
         return repo.findByUserId(userId)
     }
 
 
-    override fun delete(id: UUID): String {
+    override fun delete(id: String): String {
         logger.info("Deleting message with id: $id")
         val ent = getById(id)
         repo.delete(ent)

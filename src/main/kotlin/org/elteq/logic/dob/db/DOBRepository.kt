@@ -3,14 +3,13 @@ package org.elteq.logic.dob.db
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase
 import jakarta.enterprise.context.ApplicationScoped
 import org.elteq.base.utils.PaginatedQuery
-import java.util.*
 
 
 @ApplicationScoped
-class DOBRepository : PanacheRepositoryBase<DOB, UUID> {
+class DOBRepository : PanacheRepositoryBase<DOB, String> {
     private val paginatedQuery: PaginatedQuery = PaginatedQuery()
 
-    fun findByPatientId(id: UUID): DOB? {
+    fun findByUserId(id: String): DOB? {
         return find("patient.id", id).firstResult()
 //        return find("patientId", id).firstResult()
     }

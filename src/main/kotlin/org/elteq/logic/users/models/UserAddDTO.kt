@@ -33,6 +33,6 @@ data class UserAddDTO(
     @ValidPhoneNumber
     var phoneNumber: String? = null,
 
-    @NotNull
-    var dateOfBirth: DoBDTO? = null
+//    @NotNull
+//    var dateOfBirth: DoBDTO? = null
 )

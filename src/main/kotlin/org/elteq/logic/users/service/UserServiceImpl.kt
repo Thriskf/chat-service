@@ -20,7 +20,6 @@ import org.elteq.logic.users.models.UserUpdateStatusDTO
 import org.elteq.logic.users.spec.UserSpec
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.*
 
 @ApplicationScoped
 @Transactional
@@ -56,11 +55,11 @@ class UserServiceImpl(@Inject var repo: UserRepository) : UserService {
             gender = dto.gender
         }
 
-        ent.dateOfBirth = dto.dateOfBirth?.let {
-            val dob = dobService.create(it)
-            dob.user = ent
-            dob
-        }
+//        ent.dateOfBirth = dto.dateOfBirth?.let {
+//            val dob = dobService.create(it)
+//            dob.user = ent
+//            dob
+//        }
 
 
         val contactSet = mutableSetOf<Contact>()
@@ -86,7 +85,7 @@ class UserServiceImpl(@Inject var repo: UserRepository) : UserService {
 
     }
 
-    override fun getById(id: UUID): Users {
+    override fun getById(id: String): Users {
         return repo.findById(id) ?: throw ServiceException(-2, "User with id $id was not found")
     }
 
@@ -171,7 +170,7 @@ class UserServiceImpl(@Inject var repo: UserRepository) : UserService {
         return repo.findByContact(contact) ?: throw ServiceException(-2, "User with id $id was not found")
     }
 
-    override fun delete(id: UUID): String {
+    override fun delete(id: String): String {
         val ent = getById(id)
         repo.delete(ent)
         return "User $id deleted"

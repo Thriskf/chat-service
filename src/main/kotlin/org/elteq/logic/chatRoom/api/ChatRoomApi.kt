@@ -11,7 +11,6 @@ import org.elteq.base.apiResponse.domain.ApiResponse
 import org.elteq.logic.chatRoom.models.ChatRoomAddDTO
 import org.elteq.logic.chatRoom.models.ChatRoomDTO
 import org.elteq.logic.chatRoom.spec.ChatRoomSpec
-import java.util.*
 
 @Path("/api/v1/chat-room")
 @Produces(MediaType.APPLICATION_JSON)
@@ -26,14 +25,14 @@ interface ChatRoomApi {
 
     @GET
     @Path("/{id}")
-    fun getById(@PathParam("id") id: UUID): ApiResponse<ChatRoomDTO>
+    fun getById(@PathParam("id") id: String): ApiResponse<ChatRoomDTO>
 
     @GET
     fun search(@BeanParam spec: ChatRoomSpec): ApiResponse<List<ChatRoomDTO>>
 
     @DELETE
     @Path("/{id}")
-    fun delete(@PathParam("id") id: UUID): ApiResponse<String>
+    fun delete(@PathParam("id") id: String): ApiResponse<String>
 
 
     @DELETE

@@ -8,7 +8,7 @@ import org.elteq.logic.chatRoom.spec.ChatRoomSpec
 import java.util.*
 
 @ApplicationScoped
-class ChatRoomRepository : PanacheRepositoryBase<ChatRoom, UUID> {
+class ChatRoomRepository : PanacheRepositoryBase<ChatRoom, String> {
 
     private val paginatedQuery: PaginatedQuery = PaginatedQuery()
 
@@ -25,7 +25,7 @@ class ChatRoomRepository : PanacheRepositoryBase<ChatRoom, UUID> {
 //        ).firstResult()
 //    }
 
-    fun findByRoomIdAndUserId(roomId: UUID, userId: UUID): ChatRoom? {
+    fun findByRoomIdAndUserId(roomId: String, userId: String): ChatRoom? {
         return find(
             """
         SELECT c FROM ChatRoom c

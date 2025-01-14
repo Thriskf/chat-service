@@ -8,7 +8,7 @@ import java.util.*
 
 @Serializable
 data class ChatRoomDTO(
-    var id: UUID? = null,
+    var id: String? = null,
     var messages: MutableSet<MessageDTO>? = null,
     var createdOn: LocalDateTime? = null,
     var updatedOn: LocalDateTime? = null,

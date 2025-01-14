@@ -10,12 +10,12 @@ import java.util.*
 
 
 @ApplicationScoped
-class ContactRepository : PanacheRepositoryBase<Contact, UUID> {
+class ContactRepository : PanacheRepositoryBase<Contact, String> {
 
     private val paginatedQuery: PaginatedQuery = PaginatedQuery()
 
-    fun findByUserId(patientId: UUID): PanacheQuery<Contact> {
-        return find("user.id", patientId)
+    fun findByUserId(id: String): PanacheQuery<Contact> {
+        return find("user.id", id)
     }
 
     fun findByType(type: ContactType): PanacheQuery<Contact> {

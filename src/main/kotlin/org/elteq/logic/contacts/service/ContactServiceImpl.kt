@@ -9,18 +9,17 @@ import org.elteq.logic.contacts.db.Contact
 import org.elteq.logic.contacts.db.ContactRepository
 import org.elteq.logic.contacts.enums.ContactType
 import org.elteq.logic.contacts.spec.ContactSpec
-import java.util.*
 
 @ApplicationScoped
 @Transactional
 class ContactServiceImpl(@Inject private var repo: ContactRepository) : ContactService {
 
-    override fun findById(id: UUID): Contact {
+    override fun findById(id: String): Contact {
         return repo.findById(id) ?: throw ServiceException(-4, "Contact with id $id was not found")
     }
 
 
-    override fun findByUserId(id: UUID): PanacheQuery<Contact> {
+    override fun findByUserId(id: String): PanacheQuery<Contact> {
         return repo.findByUserId(id)
     }
 

@@ -6,17 +6,16 @@ import org.elteq.logic.messages.db.Messages
 import org.elteq.logic.messages.models.MessageAddDTO
 import org.elteq.logic.messages.models.MessageUpdateDTO
 import org.elteq.logic.messages.spec.MessageSpec
-import java.util.*
 
 interface MessageService {
 
     fun add(dto: MessageAddDTO): Messages
-    fun add(msg:String, roomId:UUID,userId:UUID): Messages
-    fun getById(id: UUID): Messages?
+    fun add(msg:String, roomId:String,userId:String): Messages
+    fun getById(id: String): Messages?
     fun update(dto: MessageUpdateDTO): Messages
     fun all(spec: MessageSpec): PanacheQuery<Messages>
-    fun getByUser(userId: UUID): PanacheQuery<Messages>
-    fun delete(id: UUID): String
+    fun getByUser(userId: String): PanacheQuery<Messages>
+    fun delete(id: String): String
     fun deleteAll(): String
     fun count(): Long
     fun updateStatus(dto: Any): Messages

@@ -8,7 +8,6 @@ import org.elteq.logic.dob.db.DOBRepository
 import org.elteq.logic.dob.models.DoBDTO
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.*
 import java.util.stream.Collectors
 
 @ApplicationScoped
@@ -41,13 +40,13 @@ class DoBServiceImpl(private val repo: DOBRepository) : DoBService {
 
     }
 
-    override fun update(dto: DoBDTO, patientId: UUID): DOB {
-        logger.info("Updating DOB for patientId: $patientId with payload: $dto")
-        val ent = this.getByPatientId(patientId)
-        logger.info("DOB for patientId: $patientId with payload: $ent")
+    override fun update(dto: DoBDTO, userId: String): DOB {
+        logger.info("Updating DOB for patientId: $userId with payload: $dto")
+        val ent = this.getByPatientId(userId)
+        logger.info("DOB for patientId: $userId with payload: $ent")
 
         if (ent == null) {
-            logger.info("no dob found for patientId: $patientId -- creating one")
+            logger.info("no dob found for patientId: $userId -- creating one")
             return create(dto)
         }
 
@@ -59,14 +58,14 @@ class DoBServiceImpl(private val repo: DOBRepository) : DoBService {
         return ent
     }
 
-    override fun getById(id: UUID): DOB? {
+    override fun getById(id: String): DOB? {
         logger.info("Getting DOB for wardId: $id")
         return repo.findById(id)
     }
 
-    override fun getByPatientId(id: UUID): DOB? {
+    override fun getByPatientId(id: String): DOB? {
         logger.info("Getting DOB for patient with wardId : $id")
-        return repo.findByPatientId(id)
+        return repo.findByUserId(id)
     }
 
     override fun findAll(): List<DOB> {
@@ -84,7 +83,7 @@ class DoBServiceImpl(private val repo: DOBRepository) : DoBService {
         return repo.deleteAll()
     }
 
-    override fun deleteById(id: UUID): String {
+    override fun deleteById(id: String): String {
         logger.info("Deleting DOB for wardId: $id")
         val ent = getById(id)
         logger.info("DOB to be deleted $ent")
@@ -92,7 +91,7 @@ class DoBServiceImpl(private val repo: DOBRepository) : DoBService {
         return "DOB with the wardId $id was deleted"
     }
 
-    override fun deleteByPatientId(id: UUID): String {
+    override fun deleteByUserId(id: String): String {
         logger.info("Deleting DOB for patient with wardId: $id")
         val ent = getByPatientId(id)
         logger.info("DOB to be deleted $ent")

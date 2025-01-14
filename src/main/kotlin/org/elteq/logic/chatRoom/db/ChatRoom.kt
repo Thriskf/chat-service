@@ -24,12 +24,18 @@ import java.util.*
 class ChatRoom : PanacheEntityBase(), Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    var id: UUID? = null
+    var id: String? = null
+
 
     @JsonIgnore
     @JsonbTransient
-    @OneToMany(mappedBy = "chatRoom", cascade = [ALL], fetch = FetchType.EAGER)
-    var users:MutableSet<Users>?= mutableSetOf()
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "user_chat_rooms",
+        joinColumns = [JoinColumn(name = "chat_room_id")],
+        inverseJoinColumns = [JoinColumn(name = "user_id")]
+    )
+    var users: MutableSet<Users>? = mutableSetOf()
 
     @OneToMany(mappedBy = "chatRoom", cascade = [ALL], fetch = FetchType.EAGER, orphanRemoval = true)
     var messages:MutableSet<Messages>?= mutableSetOf()
