@@ -5,23 +5,23 @@ name: dev-environment
 services:
 
   app:
-    image: quarkus-base-template
-    container_name: quarkus-base-template
+    image: project/chat-service:latest
+    container_name: chat-service
     depends_on:
-      zoo1:
-        condition: service_started
-      zoo2:
-        condition: service_started
-      zoo3:
-        condition: service_started
+#      zoo1:
+#        condition: service_started
+#      zoo2:
+#        condition: service_started
+#      zoo3:
+#        condition: service_started
       keycloak:
         condition: service_started
       mariadb:
         condition: service_started
-      rabbitmq:
-        condition: service_started
+#      rabbitmq:
+#        condition: service_started
     ports:
-      - "8081:8080"
+      - "8050:8050"
 
   phpmyadmin:
     image: phpmyadmin:latest

@@ -1,10 +1,10 @@
 #!/bin/bash
 
 base=project
-name=hospital-service
+name=chat-service
 version=latest
 image=$base/$name:$version
-docker rmi $image
+docker rmi $image -f
 #docker rmi registry.generisdevelopers.com/hospital-management-system/patient-service:$version
 
 DOCKER_BUILDKIT=1 docker buildx build --platform linux/amd64 -f docker/Dockerfile -t $image .

@@ -456,62 +456,62 @@
                     <jvmTarget>21</jvmTarget>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>org.elteq.Main</mainClass> <!-- Replace with your main class -->
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
 <!--            <plugin>-->
 <!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-compiler-plugin</artifactId>-->
+<!--                <artifactId>maven-shade-plugin</artifactId>-->
+<!--                <version>3.5.0</version>-->
 <!--                <executions>-->
 <!--                    <execution>-->
-<!--                        <wardId>default-compile</wardId>-->
-<!--                        <phase>none</phase>-->
-<!--                    </execution>-->
-<!--                    <execution>-->
-<!--                        <wardId>default-testCompile</wardId>-->
-<!--                        <phase>none</phase>-->
-<!--                    </execution>-->
-<!--                    <execution>-->
-<!--                        <wardId>compile</wardId>-->
-<!--                        <phase>compile</phase>-->
+<!--                        <phase>package</phase>-->
 <!--                        <goals>-->
-<!--                            <goal>compile</goal>-->
+<!--                            <goal>shade</goal>-->
 <!--                        </goals>-->
-<!--                    </execution>-->
-<!--                    <execution>-->
-<!--                        <wardId>testCompile</wardId>-->
-<!--                        <phase>test-compile</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>testCompile</goal>-->
-<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <createDependencyReducedPom>false</createDependencyReducedPom>-->
+<!--                        </configuration>-->
 <!--                    </execution>-->
 <!--                </executions>-->
 <!--            </plugin>-->
-            <!--            <plugin>-->
-            <!--                <groupId>org.apache.maven.plugins</groupId>-->
-            <!--                <artifactId>maven-compiler-plugin</artifactId>-->
-            <!--                <executions>-->
-            <!--                    <execution>-->
-            <!--                        <wardId>default-compile</wardId>-->
-            <!--                        <phase>none</phase>-->
-            <!--                    </execution>-->
-            <!--                    <execution>-->
-            <!--                        <wardId>default-testCompile</wardId>-->
-            <!--                        <phase>none</phase>-->
-            <!--                    </execution>-->
-            <!--                    <execution>-->
-            <!--                        <wardId>compile</wardId>-->
-            <!--                        <phase>compile</phase>-->
-            <!--                        <goals>-->
-            <!--                            <goal>compile</goal>-->
-            <!--                        </goals>-->
-            <!--                    </execution>-->
-            <!--                    <execution>-->
-            <!--                        <wardId>testCompile</wardId>-->
-            <!--                        <phase>test-compile</phase>-->
-            <!--                        <goals>-->
-            <!--                            <goal>testCompile</goal>-->
-            <!--                        </goals>-->
-            <!--                    </execution>-->
-            <!--                </executions>-->
-            <!--            </plugin>-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.1</version>
+                <configuration>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <profiles>
