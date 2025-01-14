@@ -15,6 +15,7 @@ interface MessageService {
     fun getById(id: UUID): Messages?
     fun update(dto: MessageUpdateDTO): Messages
     fun all(spec: MessageSpec): PanacheQuery<Messages>
+    fun getByUser(userId: UUID): PanacheQuery<Messages>
     fun delete(id: UUID): String
     fun deleteAll(): String
     fun count(): Long

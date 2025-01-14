@@ -76,6 +76,11 @@ class MessageServiceImpl(@Inject var repo: MessageRepository) : MessageService {
         return repo.all(spec)
     }
 
+    override fun getByUser(userId: UUID): PanacheQuery<Messages> {
+        logger.info("Getting messages for user with id: $userId")
+        return repo.findByUserId(userId)
+    }
+
 
     override fun delete(id: UUID): String {
         logger.info("Deleting message with id: $id")

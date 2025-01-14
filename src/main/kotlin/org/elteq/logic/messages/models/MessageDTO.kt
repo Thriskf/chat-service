@@ -9,7 +9,7 @@ import java.util.*
 data class MessageDTO(
     var id: UUID? = null,
     var message: String? = null,
-    var user: Set<UserDTO>? = null,
+    var user: UserDTO? = null,
     var createdOn: LocalDateTime? = null,
     var updatedOn: LocalDateTime? = null
 )

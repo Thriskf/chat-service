@@ -2,13 +2,14 @@ package org.elteq.logic.messages.api
 
 import io.quarkus.security.Authenticated
 import jakarta.validation.Valid
-import jakarta.websocket.server.ServerEndpoint
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.elteq.base.apiResponse.domain.ApiResponse
+import org.elteq.logic.messages.models.MessageAddDTO
+import org.elteq.logic.messages.models.MessageDTO
 import org.elteq.logic.messages.spec.MessageSpec
 import java.util.*
 
@@ -21,29 +22,26 @@ import java.util.*
 interface MessageApi {
 
     @POST
-    fun add(@Valid dto: Any): ApiResponse<Any>
+    fun add(@Valid dto: MessageAddDTO): ApiResponse<MessageDTO>
 
     @GET
     @Path("/{id}")
-    fun getById(@PathParam("id") id: UUID): ApiResponse<Any>
+    fun getById(@PathParam("id") id: UUID): ApiResponse<MessageDTO>
 
     @GET
-    fun search(@BeanParam spec: MessageSpec): ApiResponse<List<Any>>
-
-    @PUT
-    fun addInCharge(dto: Any): ApiResponse<Any>
+    fun search(@BeanParam spec: MessageSpec): ApiResponse<List<MessageDTO>>
 
     @GET
-    @Path("/{email}")
-    fun getByContact(@PathParam("email") email: String): Response
+    @Path("/{userId}")
+    fun getByUser(@PathParam("userId") userId: UUID): ApiResponse<List<MessageDTO>>
 
     @DELETE
-    @Path("/{wardId}")
-    fun delete(@PathParam("wardId") wardId: UUID): Response
+    @Path("/{id}")
+    fun delete(@PathParam("id") id: UUID): Response
 
     @PUT
     @Path("/status")
-    fun updateStatus(dto: Any): ApiResponse<Any>
+    fun updateStatus(dto: Any): ApiResponse<MessageDTO>
 
     @DELETE
     fun deleteAll(): Response
