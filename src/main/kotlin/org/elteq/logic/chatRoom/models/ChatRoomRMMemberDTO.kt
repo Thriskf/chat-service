@@ -6,10 +6,12 @@ import org.elteq.base.validators.ValidPhoneNumber
 import org.elteq.base.validators.ValidateArrayPhoneNumber
 
 @Serializable
-data class ChatRoomAddDTO(
+data class ChatRoomRMMemberDTO (
     @NotBlank
-    @ValidateArrayPhoneNumber
-    var phoneNumbers: MutableSet<String>? = mutableSetOf(),
+    var id: String? = null,
 
-    var name: String?=null,
-)
+    @NotBlank
+    @ValidPhoneNumber
+    var phoneNumber: String? =null,
+
+    )

@@ -47,7 +47,7 @@ class UserSpec : PaginationDto() {
     }
 
     override fun toString(): String {
-        return "UserSpec(from=$from, to=$to)"
+        return "UserSpec(status=$status, from=$from, to=$to)"
     }
 
 

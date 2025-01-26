@@ -14,7 +14,7 @@ class DOBRepository : PanacheRepositoryBase<DOB, String> {
 //        return find("patientId", id).firstResult()
     }
 
-//    fun all(spec: PatientSpec, operation: String = "and"): PanacheQuery<DOB> {
+//    fun filter(spec: PatientSpec, operation: String = "and"): PanacheQuery<DOB> {
 //        if (spec.sortBy == "createdOn") spec.sortBy = "createdOn"
 //        return paginatedQuery.toQuery(spec, operation, this)
 //    }

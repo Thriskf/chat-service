@@ -115,15 +115,15 @@ class MessageApiImpl(@Inject var service: MessageService) : MessageApi {
     }
 
     override fun deleteAll(): Response {
-        logger.info("Deleting all messages.")
+        logger.info("Deleting filter messages.")
         try {
             val ent = service.deleteAll()
             val response = wrapApiResponse(ent)
             logger.info("Deleted $response messages.")
             return response
         } catch (e: Exception) {
-            logger.error("Failed to delete all messages.", e)
-            throw ServiceException(-2, "Could not delete all messages.")
+            logger.error("Failed to delete filter messages.", e)
+            throw ServiceException(-2, "Could not delete filter messages.")
         }
 
     }

@@ -19,5 +19,6 @@ interface UserService {
     fun deleteAll(): String
     fun count(): Long
     fun updateStatus(dto: UserUpdateStatusDTO): Users
+    fun export(spec: UserSpec):String
 
 }

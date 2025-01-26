@@ -3,6 +3,7 @@ package org.elteq.logic.chatRoom.spec
 /**/import jakarta.ws.rs.QueryParam
 import lombok.Data
 import org.elteq.base.utils.PaginationDto
+import org.elteq.logic.chatRoom.enums.ChatRoomType
 import java.time.LocalDateTime
 
 @Data
@@ -16,11 +17,11 @@ class ChatRoomSpec : PaginationDto() {
 //    @QueryParam("status")
 //    var status: DutyStatus? = null
 
-//    @QueryParam("unit")
-//    var unit: Unit? = null
-//
-//    @QueryParam("specialty")
-//    var specialty: Specialty? = null
+    @QueryParam("type")
+    var type: ChatRoomType? = null
+
+    @QueryParam("name")
+    var name: String? = null
 
     @QueryParam("from")
     var from: LocalDateTime? = null
@@ -31,8 +32,8 @@ class ChatRoomSpec : PaginationDto() {
     override fun toMap(): Map<String, Any> {
         val params = mutableMapOf<String, Any>()
 
-//        email?.let { params["email"] = email!! }
-//        phoneNumber?.let { params["phoneNumber"] = phoneNumber!! }
+        name?.let { params["name"] = name!! }
+        type?.let { params["type"] = type!! }
 //        status?.let { params["phoneNumber"] = status!! }
 //        unit?.let { params["unit"] = unit!! }
 //        specialty?.let { params["specialty"] = specialty!! }
@@ -46,7 +47,7 @@ class ChatRoomSpec : PaginationDto() {
     }
 
     override fun toString(): String {
-        return "ChatRoomSpec(from=$from, to=$to)"
+        return "ChatRoomSpec(type=$type, name=$name, from=$from, to=$to)"
     }
 
 

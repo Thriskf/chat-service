@@ -69,7 +69,7 @@ class DoBServiceImpl(private val repo: DOBRepository) : DoBService {
     }
 
     override fun findAll(): List<DOB> {
-        logger.info("Getting all DOBs")
+        logger.info("Getting filter DOBs")
 
         val entities = repo.findAll().stream<DOB>()
             .collect(Collectors.toList())
@@ -79,7 +79,7 @@ class DoBServiceImpl(private val repo: DOBRepository) : DoBService {
     }
 
     override fun deleteAll(): Long {
-        logger.info("Deleting all DOBs")
+        logger.info("Deleting filter DOBs")
         return repo.deleteAll()
     }
 

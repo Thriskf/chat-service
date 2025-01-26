@@ -90,7 +90,7 @@ class MessageServiceImpl(@Inject var repo: MessageRepository) : MessageService {
     }
 
     override fun deleteAll(): String {
-        logger.info("Deleting all messages.")
+        logger.info("Deleting filter messages.")
         val res = repo.deleteAll()
         logger.info("Deleted $res messages.")
         return "Deleted $res messages."

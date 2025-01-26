@@ -4,14 +4,21 @@ import io.quarkus.hibernate.orm.panache.PanacheQuery
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase
 import jakarta.enterprise.context.ApplicationScoped
 import org.elteq.base.utils.PaginatedQuery
+import org.elteq.logic.chatRoom.enums.ChatRoomType
 import org.elteq.logic.chatRoom.spec.ChatRoomSpec
-import java.util.*
 
 @ApplicationScoped
 class ChatRoomRepository : PanacheRepositoryBase<ChatRoom, String> {
 
     private val paginatedQuery: PaginatedQuery = PaginatedQuery()
 
+    fun findByType(type: ChatRoomType): PanacheQuery<ChatRoom> {
+        return find("type", type)
+    }
+
+    fun findByName(name: String): PanacheQuery<ChatRoom> {
+        return find("name", name)
+    }
 
 //    fun findByRoomIdAndUserId(roomId: UUID, userId: UUID): ChatRoom? {
 //        return find(
@@ -24,6 +31,16 @@ class ChatRoomRepository : PanacheRepositoryBase<ChatRoom, String> {
 //            mapOf("roomId" to roomId, "userId" to userId)
 //        ).firstResult()
 //    }
+
+    fun findByUserId(userId: String): PanacheQuery<ChatRoom> {
+        return find(
+            """
+        SELECT c FROM ChatRoom c
+        JOIN c.users u
+        WHERE u.id = :userId
+        """, mapOf("userId" to userId)
+        )
+    }
 
     fun findByRoomIdAndUserId(roomId: String, userId: String): ChatRoom? {
         return find(
@@ -38,7 +55,7 @@ class ChatRoomRepository : PanacheRepositoryBase<ChatRoom, String> {
     }
 
 
-    fun all(spec: ChatRoomSpec, operation: String = "and"): PanacheQuery<ChatRoom> {
+    fun filter(spec: ChatRoomSpec, operation: String = "and"): PanacheQuery<ChatRoom> {
 //        if (spec.sortBy == "createdOn") spec.sortBy = "createdOn"
         return paginatedQuery.toQuery(spec, operation, this)
     }

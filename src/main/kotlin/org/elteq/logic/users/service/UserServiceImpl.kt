@@ -1,25 +1,24 @@
 package org.elteq.logic.users.service
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity_.id
 import io.quarkus.hibernate.orm.panache.PanacheQuery
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.inject.Default
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
 import org.elteq.base.exception.ServiceException
+import org.elteq.base.utils.ExportUtil
+import org.elteq.base.utils.MapperUtil.Mapper
 import org.elteq.logic.contacts.db.Contact
 import org.elteq.logic.contacts.enums.ContactType
 import org.elteq.logic.contacts.service.ContactService
 import org.elteq.logic.dob.servcice.DoBService
 import org.elteq.logic.users.db.UserRepository
 import org.elteq.logic.users.db.Users
-import org.elteq.logic.users.models.UserAddDTO
-import org.elteq.logic.users.models.UserUpdateContactDTO
-import org.elteq.logic.users.models.UserUpdateNameDTO
-import org.elteq.logic.users.models.UserUpdateStatusDTO
+import org.elteq.logic.users.models.*
 import org.elteq.logic.users.spec.UserSpec
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.util.stream.Collectors
 
 @ApplicationScoped
 @Transactional
@@ -27,6 +26,8 @@ class UserServiceImpl(@Inject var repo: UserRepository) : UserService {
     @Inject
     @field:Default
     private lateinit var contactService: ContactService
+
+    private val modelMapper = Mapper.mapper
 
 
     @Inject
@@ -167,7 +168,7 @@ class UserServiceImpl(@Inject var repo: UserRepository) : UserService {
     }
 
     override fun getByContact(contact: String): Users {
-        return repo.findByContact(contact) ?: throw ServiceException(-2, "User with id $id was not found")
+        return repo.findByContact(contact) ?: throw ServiceException(-2, "User with contact $contact was not found")
     }
 
     override fun delete(id: String): String {
@@ -203,4 +204,20 @@ class UserServiceImpl(@Inject var repo: UserRepository) : UserService {
         }
         return false
     }
+
+    override fun export(spec: UserSpec): String {
+        logger.info("about to export data")
+        val ents = this.all(spec)
+
+        val data = ents.stream<Users>().map {
+            logger.info("mapped users: $it to dto:")
+            modelMapper.map(it, UserDTO::class.java)
+        }.collect(Collectors.toList())
+//        val excludedFields = listOf("executionResponse", "payload", "headers", "httpMethod", "endpoint", "serviceName", "version")
+        val excludedFields: List<String> = listOf("contacts")
+
+        return ExportUtil().generateCsv(data, UserDTO(), excludedFields)
+
+    }
+
 }

@@ -8,8 +8,8 @@ import jakarta.ws.rs.core.Response
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.elteq.base.apiResponse.domain.ApiResponse
-import org.elteq.logic.chatRoom.models.ChatRoomAddDTO
-import org.elteq.logic.chatRoom.models.ChatRoomDTO
+import org.elteq.logic.chatRoom.enums.ChatRoomType
+import org.elteq.logic.chatRoom.models.*
 import org.elteq.logic.chatRoom.spec.ChatRoomSpec
 
 @Path("/api/v1/chat-room")
@@ -41,6 +41,29 @@ interface ChatRoomApi {
     @GET
     @Path("/total")
     fun count(): Response
+
+    @GET
+    @Path("/user/{id}")
+    fun getByUserId(@PathParam("id") userId: String): ApiResponse<List<ChatRoomDTO>>
+
+    @GET
+    @Path("/name/{name}")
+    fun getByName(@PathParam("name") name: String): ApiResponse<List<ChatRoomDTO>>
+
+    @GET
+    @Path("/type/{type}")
+    fun getByType(@PathParam("type") type: ChatRoomType): ApiResponse<List<ChatRoomDTO>>
+
+    @PUT
+    @Path("/add-member")
+    fun addGroupMember(dto: ChatRoomAddMemberDTO): ApiResponse<ChatRoomDTO>
+
+    @PUT
+    @Path("/remove-member")
+    fun removeGroupMember(dto: ChatRoomRMMemberDTO): ApiResponse<ChatRoomDTO>
+
+    @Path("/change-name")
+    fun changeGroupName(dto: ChatRoomChangeNameDTO): ApiResponse<ChatRoomDTO>
 
 
 }

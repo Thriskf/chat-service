@@ -56,5 +56,10 @@ interface UserApi {
     @Path("/total")
     fun count(): Response
 
+    @GET
+    @Path("/export")
+    @Produces(value = [MediaType.WILDCARD, MediaType.MEDIA_TYPE_WILDCARD])
+    fun export(@BeanParam spec: UserSpec): Response
+
 
 }

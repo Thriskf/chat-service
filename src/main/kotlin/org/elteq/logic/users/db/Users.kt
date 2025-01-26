@@ -44,7 +44,7 @@ class Users : PanacheEntityBase(), Serializable {
 
     @JsonIgnore
     @JsonbTransient
-    @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY, cascade = [ALL])
+    @ManyToMany(mappedBy = "users", fetch = FetchType.EAGER, cascade = [ALL])
     var chatRooms: MutableSet<ChatRoom>? = mutableSetOf()
 
     @JsonIgnore

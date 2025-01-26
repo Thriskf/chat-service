@@ -15,6 +15,10 @@ import org.elteq.logic.users.service.UserService
 import org.elteq.logic.users.spec.UserSpec
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.time.Clock
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.stream.Collectors
 
@@ -143,15 +147,15 @@ class UserApiImpl(@Inject var service: UserService) : UserApi {
     }
 
     override fun deleteAll(): ApiResponse<String> {
-        logger.info("Deleting all users")
+        logger.info("Deleting filter users")
         try {
             val result = service.deleteAll()
             val response = wrapInApiResponse(result)
-            logger.info("Delete all users response: $response")
+            logger.info("Delete filter users response: $response")
             return response
         } catch (e: Exception) {
-            logger.error("Failed to delete all users", e)
-            return wrapFailureInResponse("Failed to delete all users")
+            logger.error("Failed to delete filter users", e)
+            return wrapFailureInResponse("Failed to delete filter users")
         }
     }
 
@@ -165,6 +169,26 @@ class UserApiImpl(@Inject var service: UserService) : UserApi {
         } catch (e: Exception) {
             logger.error("could not count users")
             throw ServiceException(-3, "Could not get count of users")
+        }
+    }
+
+
+    override fun export(spec: UserSpec): Response {
+        logger.info("http request: export with filter $spec")
+        return try {
+            val currentTime = LocalDateTime.now()
+            val ftime = currentTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"))
+            val fileName = "chat_users_$ftime.csv"
+
+            val csvData = service.export(spec)
+            Response.ok(csvData)
+                .header("Content-Disposition", "attachment; filename=$fileName")
+                .build()
+        } catch (e: Exception) {
+            logger.error("error occurred while exporting data", e)
+            Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity("Error generating CSV: ${e.message}")
+                .build()
         }
     }
 }
