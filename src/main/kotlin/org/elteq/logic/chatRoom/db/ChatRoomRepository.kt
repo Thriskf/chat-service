@@ -2,6 +2,7 @@ package org.elteq.logic.chatRoom.db
 
 import io.quarkus.hibernate.orm.panache.PanacheQuery
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase
+import io.quarkus.panache.common.Sort
 import jakarta.enterprise.context.ApplicationScoped
 import org.elteq.base.utils.PaginatedQuery
 import org.elteq.logic.chatRoom.enums.ChatRoomType
@@ -33,12 +34,14 @@ class ChatRoomRepository : PanacheRepositoryBase<ChatRoom, String> {
 //    }
 
     fun findByUserId(userId: String): PanacheQuery<ChatRoom> {
+        val sort = Sort.descending("updatedOn")
+
         return find(
             """
         SELECT c FROM ChatRoom c
         JOIN c.users u
         WHERE u.id = :userId
-        """, mapOf("userId" to userId)
+        """, sort, mapOf("userId" to userId)
         )
     }
 

@@ -14,6 +14,7 @@ import org.elteq.logic.messages.spec.MessageSpec
 import org.elteq.logic.users.service.UserService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.time.LocalDateTime
 
 @ApplicationScoped
 @Transactional
@@ -53,6 +54,7 @@ class MessageServiceImpl(@Inject var repo: MessageRepository) : MessageService {
 
         logger.info("Attaching message to room...")
         room?.messages?.add(ent)
+        room?.updatedOn = LocalDateTime.now()
 
         logger.info("Persisting new message...")
         repo.persist(ent)
