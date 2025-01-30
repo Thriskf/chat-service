@@ -213,8 +213,7 @@ class UserServiceImpl(@Inject var repo: UserRepository) : UserService {
             logger.info("mapped users: $it to dto:")
             modelMapper.map(it, UserDTO::class.java)
         }.collect(Collectors.toList())
-//        val excludedFields = listOf("executionResponse", "payload", "headers", "httpMethod", "endpoint", "serviceName", "version")
-        val excludedFields: List<String> = listOf("contacts")
+        val excludedFields: Set<String> = setOf("contacts")
 
         return ExportUtil().generateCsv(data, UserDTO(), excludedFields)
 
