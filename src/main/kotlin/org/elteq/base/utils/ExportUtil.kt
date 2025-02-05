@@ -70,7 +70,7 @@ class ExportUtil {
             "contacts" -> {
                 val contacts = property?.call(data) as? Set<Contact>
                 // Extract specific values from the contacts (e.g., emails)
-                contacts?.joinToString(";") { it.value ?: "" } ?: ""
+                contacts?.joinToString(";") { it.value } ?: ""
             }
 
             else -> property?.call(data)?.toString() ?: ""
