@@ -77,6 +77,15 @@ services:
     volumes:
       - ./initdb:/docker-entrypoint-initdb.d
 
+  openTelemetry:
+    image: otel/opentelemetry-collector-contrib
+    container_name: dev-opt
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+
+
+
   mongo:
     image: mongo:latest
 #    restart: always
