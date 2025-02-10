@@ -77,12 +77,33 @@ services:
     volumes:
       - ./initdb:/docker-entrypoint-initdb.d
 
+  good-jaegar:
+    image: jaegertracing/jaeger:2.3.0
+    container_name: callback-failure-jaeger
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+      - "5778:5778"
+      - "9411:9411"
+
   openTelemetry:
     image: otel/opentelemetry-collector-contrib
     container_name: dev-opt
     ports:
       - "4317:4317"
       - "4318:4318"
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: dev-jaeger
+    ports:
+      - "16686:16686"  # Jaeger UI
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true  # Enable OTLP receiver in Jaeger
+#    networks:
+#      - addis
+
 
 
 
@@ -250,3 +271,31 @@ services:
         condition: service_started
       mongo:
         condition: service_started
+
+
+#services:
+#  openTelemetry:
+#    image: otel/opentelemetry-collector-contrib
+#    container_name: dev-opt
+#    ports:
+#      - "4317:4317"
+#      - "4318:4318"
+#    volumes:
+#      - ./otel-config.yaml:/etc/otel-collector-config.yaml
+#    command: [ "--config=/etc/otel-collector-config.yaml" ]
+#    networks:
+#      - tracing-network
+#
+#  jaeger:
+#    image: jaegertracing/all-in-one:latest
+#    container_name: dev-jaeger
+#    ports:
+#      - "16686:16686"
+#    environment:
+#      - COLLECTOR_OTLP_ENABLED=true
+#    networks:
+#      - tracing-network
+#
+#networks:
+#  tracing-network:
+#    driver: bridge
