@@ -77,9 +77,9 @@ services:
     volumes:
       - ./initdb:/docker-entrypoint-initdb.d
 
-  good-jaegar:
+  jaeger:
     image: jaegertracing/jaeger:2.3.0
-    container_name: callback-failure-jaeger
+    container_name: dev-jaeger
     ports:
       - "16686:16686"
       - "4317:4317"
@@ -94,7 +94,7 @@ services:
       - "4317:4317"
       - "4318:4318"
 
-  jaeger:
+  jaeger-1:
     image: jaegertracing/all-in-one:latest
     container_name: dev-jaeger
     ports:
