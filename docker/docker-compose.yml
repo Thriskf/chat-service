@@ -4,7 +4,7 @@ name: dev-environment
 
 services:
 
-  app:
+  chat-service:
     image: project/chat-service:latest
     container_name: chat-service
     depends_on:
@@ -24,6 +24,9 @@ services:
       - "8050:8050"
 #    network_mode: host
     network_mode: bridge
+    networks:
+      - default-bridge-network
+
 
   phpmyadmin:
     image: phpmyadmin:latest
@@ -77,6 +80,47 @@ services:
     volumes:
       - ./initdb:/docker-entrypoint-initdb.d
 
+  mysqldb:
+    image: mysql:latest
+    container_name: dev-mysql
+    restart: always
+    ports:
+      - "8031:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: banbo_ms
+  #      networks:
+  #        - default-network
+
+
+  banbo:
+    image: banbo-backend-v0.0.1:latest
+    container_name: banbo
+    ports:
+      - "8091:8080"
+    environment:
+      - DB_HOST=mysqldb  # Use the service name as the hostname
+      - DB_PORT=3306     # MySQL default port
+      - DB_NAME=banbo_ms
+      - DB_USER=root
+      - DB_PASSWORD=password
+
+    depends_on:
+      #      zoo1:
+      #        condition: service_started
+      #      zoo2:
+      #        condition: service_started
+      #      zoo3:
+      #        condition: service_started
+      keycloak:
+        condition: service_started
+      mysqldb:
+        condition: service_started
+
+#    networks:
+#      - default-network
+
+
   jaeger:
     image: jaegertracing/jaeger:2.3.0
     container_name: dev-jaeger
@@ -99,12 +143,14 @@ services:
     container_name: dev-jaeger
     ports:
       - "16686:16686"  # Jaeger UI
+      - "4317:4317"
+      - "4318:4318"
+      - "5778:5778"
+      - "9411:9411"
     environment:
       - COLLECTOR_OTLP_ENABLED=true  # Enable OTLP receiver in Jaeger
 #    networks:
 #      - addis
-
-
 
 
   mongo:
@@ -271,6 +317,8 @@ services:
         condition: service_started
       mongo:
         condition: service_started
+      mysqldb:
+        condition: service_started
 
 
 #services:
@@ -296,6 +344,10 @@ services:
 #    networks:
 #      - tracing-network
 #
-#networks:
-#  tracing-network:
-#    driver: bridge
+
+networks:
+  default-bridge-network:
+    driver: bridge
+
+  default--host-network:
+    driver: host
