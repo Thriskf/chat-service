@@ -4,6 +4,7 @@ import io.quarkus.hibernate.orm.panache.PanacheQuery
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.inject.Default
 import jakarta.inject.Inject
+import jakarta.inject.Singleton
 import jakarta.transaction.Transactional
 import org.elteq.base.exception.ServiceException
 import org.elteq.base.utils.ExportUtil
@@ -21,7 +22,7 @@ import org.slf4j.LoggerFactory
 import java.util.stream.Collectors
 
 @ApplicationScoped
-@Transactional
+//@Singleton
 class UserServiceImpl(@Inject var repo: UserRepository) : UserService {
     @Inject
     @field:Default
@@ -36,6 +37,7 @@ class UserServiceImpl(@Inject var repo: UserRepository) : UserService {
 
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
+    @Transactional
     override fun add(dto: UserAddDTO): Users {
 
         val userExist = phoneOrEmailLookUp(dto.phoneNumber, dto.email)
@@ -90,6 +92,7 @@ class UserServiceImpl(@Inject var repo: UserRepository) : UserService {
         return repo.findById(id) ?: throw ServiceException(-2, "User with id $id was not found")
     }
 
+    @Transactional
     override fun updateName(dto: UserUpdateNameDTO): Users {
 
         val ent = getById(dto.id!!)
@@ -109,9 +112,11 @@ class UserServiceImpl(@Inject var repo: UserRepository) : UserService {
 
         repo.entityManager.merge(ent)
         logger.info("User updated with names: $ent")
+
         return ent
     }
 
+    @Transactional
     override fun updateContact(dto: UserUpdateContactDTO): Users {
         val ent = getById(dto.id!!)
 
@@ -149,7 +154,8 @@ class UserServiceImpl(@Inject var repo: UserRepository) : UserService {
 
 
         } else {
-            contact.parallelStream().forEach {
+//            contact.parallelStream().forEach {
+            contact.forEach {
                 if (it.type == ContactType.MOBILE && dto.phoneNumber != null) {
                     contactService.update(it, dto.phoneNumber!!)
                 }
@@ -186,6 +192,7 @@ class UserServiceImpl(@Inject var repo: UserRepository) : UserService {
         return repo.count()
     }
 
+    @Transactional
     override fun updateStatus(dto: UserUpdateStatusDTO): Users {
         val ent = getById(dto.id!!)
         ent.status = dto.status
@@ -195,7 +202,7 @@ class UserServiceImpl(@Inject var repo: UserRepository) : UserService {
     }
 
     private fun phoneOrEmailLookUp(msisdn: String?, email: String?): Boolean {
-        email?.takeIf { it.isNotBlank() }?.let {
+        email?.takeUnless { it.isBlank() }?.let {
             if (repo.findByContact(it) != null) return true
         }
 

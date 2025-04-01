@@ -1,4 +1,4 @@
-package org.elteq.logic.chatRoom.db
+package org.elteq.logic.chatRoom.models
 
 import io.quarkus.hibernate.orm.panache.PanacheQuery
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase

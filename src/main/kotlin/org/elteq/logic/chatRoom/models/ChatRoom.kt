@@ -1,4 +1,4 @@
-package org.elteq.logic.chatRoom.db
+package org.elteq.logic.chatRoom.models
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase

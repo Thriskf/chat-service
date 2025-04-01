@@ -1,4 +1,4 @@
-package org.elteq.logic.chatRoom.models
+package org.elteq.logic.chatRoom.dtos
 
 import kotlinx.serialization.Serializable
 import org.elteq.logic.messages.models.MessageDTO

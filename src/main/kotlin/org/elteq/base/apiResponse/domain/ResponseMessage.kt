@@ -1,6 +1,7 @@
 package org.elteq.base.apiResponse.domain
 
-enum class ResponseMessage(val code: Int, val message: String) {
-    SUCCESS(0, "Success"),
-    FAIL(1, "Failed"),
+enum class ResponseMessage(val code: String, val message: String) {
+    SUCCESS("00", "Success"),
+    FAIL("01", "Failed"),
+    PENDING("03", "Pending"),
 }

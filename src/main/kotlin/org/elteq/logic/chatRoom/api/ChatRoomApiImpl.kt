@@ -7,12 +7,12 @@ import jakarta.ws.rs.core.Response
 import org.elteq.base.apiResponse.GenericHttpResponse.Companion.wrapApiResponse
 import org.elteq.base.apiResponse.domain.ApiResponse
 import org.elteq.base.apiResponse.wrapFailureInResponse
-import org.elteq.base.apiResponse.wrapInApiResponse
+import org.elteq.base.apiResponse.wrapInSuccessResponse
 import org.elteq.base.exception.ServiceException
 import org.elteq.base.utils.MapperUtil.Mapper
-import org.elteq.logic.chatRoom.db.ChatRoom
+import org.elteq.logic.chatRoom.dtos.*
 import org.elteq.logic.chatRoom.enums.ChatRoomType
-import org.elteq.logic.chatRoom.models.*
+import org.elteq.logic.chatRoom.models.ChatRoom
 import org.elteq.logic.chatRoom.service.ChatRoomService
 import org.elteq.logic.chatRoom.spec.ChatRoomSpec
 import org.slf4j.Logger
@@ -24,18 +24,9 @@ class ChatRoomApiImpl(@Inject var service: ChatRoomService) : ChatRoomApi {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
     private val modelMapper = Mapper.mapper
 
-    override fun add(dto: ChatRoomAddDTO): ApiResponse<ChatRoomDTO> {
+    override fun add(dto: ChatRoomAddDTO): ChatRoomResponse {
         logger.info("add chat room with payload: $dto")
-        try {
-            val ent = service.add(dto)
-            val dto = modelMapper.map(ent, ChatRoomDTO::class.java)
-            val response = wrapInApiResponse(dto)
-            logger.info("added chat room with payload: $response")
-            return response
-        } catch (e: Exception) {
-            logger.error("Failed to add chat room:", e)
-            return wrapFailureInResponse("Could not add chat room")
-        }
+        return service.add(dto)
     }
 
     override fun getById(id: String): ApiResponse<ChatRoomDTO> {
@@ -43,7 +34,7 @@ class ChatRoomApiImpl(@Inject var service: ChatRoomService) : ChatRoomApi {
         try {
             val ent = service.getById(id)
             val dto = modelMapper.map(ent, ChatRoomDTO::class.java)
-            val response = wrapInApiResponse(dto)
+            val response = wrapInSuccessResponse(dto)
             logger.info("get chat room with id: $response")
             return response
         } catch (e: NoSuchElementException) {
@@ -55,32 +46,17 @@ class ChatRoomApiImpl(@Inject var service: ChatRoomService) : ChatRoomApi {
         }
     }
 
-    override fun search(spec: ChatRoomSpec): ApiResponse<List<ChatRoomDTO>> {
+    override fun search(spec: ChatRoomSpec): ChatRoomPaginatedResponse {
         logger.info("filter chatroom with $spec")
-        try {
-            val ents = service.filter(spec)
-            val dtos = ents.stream<ChatRoom>().map {
-                modelMapper.map(it, ChatRoomDTO::class.java)
-            }
-            logger.info("chat room DTOs $dtos")
-            val response = wrapInApiResponse(dtos.toList())
-            logger.info("filtered chatroom with $spec: $response")
-            return response
+        return service.filter(spec)
 
-        } catch (e: NoSuchElementException) {
-            logger.error("could not filter chatroom", e)
-            return wrapFailureInResponse("No chat room found with id: $id")
-        } catch (e: Exception) {
-            logger.error("Failed to filter chatrooms:", e)
-            return wrapFailureInResponse("Could not get chatrooms")
-        }
     }
 
     override fun delete(id: String): ApiResponse<String> {
         logger.info("delete chatroom with id: $id")
         try {
             val ent = service.delete(id)
-            val response = wrapInApiResponse(ent)
+            val response = wrapInSuccessResponse(ent)
             logger.info("deleted chatroom with id: $response")
             return response
         } catch (e: NoSuchElementException) {
@@ -96,7 +72,7 @@ class ChatRoomApiImpl(@Inject var service: ChatRoomService) : ChatRoomApi {
         logger.info("delete filter chatrooms")
         try {
             val ent = service.deleteAll()
-            val response = wrapInApiResponse(ent)
+            val response = wrapInSuccessResponse(ent)
             logger.info("deleted filter chatrooms: $response")
             return response
         } catch (e: Exception) {
@@ -126,7 +102,7 @@ class ChatRoomApiImpl(@Inject var service: ChatRoomService) : ChatRoomApi {
                 modelMapper.map(it, ChatRoomDTO::class.java)
             }.collect(Collectors.toList())
             logger.info("get by user id dtos : $dtos")
-            val response = wrapInApiResponse(dtos)
+            val response = wrapInSuccessResponse(dtos)
             logger.info("get by user id dtos: $response")
             response
 
@@ -145,7 +121,7 @@ class ChatRoomApiImpl(@Inject var service: ChatRoomService) : ChatRoomApi {
             }.collect(Collectors.toList())
 
             logger.info("get chatroom by name dto: $dtos")
-            val response = wrapInApiResponse(dtos)
+            val response = wrapInSuccessResponse(dtos)
             logger.info("get chat room by name dto: $response")
             return response
         } catch (e: Exception) {
@@ -162,7 +138,7 @@ class ChatRoomApiImpl(@Inject var service: ChatRoomService) : ChatRoomApi {
                 modelMapper.map(it, ChatRoomDTO::class.java)
             }.collect(Collectors.toList())
             logger.info("GET by type dtos :: $dtos")
-            val response = wrapInApiResponse(dtos)
+            val response = wrapInSuccessResponse(dtos)
             logger.info("get chat room by type dtos :: $response")
             response
         } catch (e: Exception) {
@@ -176,7 +152,7 @@ class ChatRoomApiImpl(@Inject var service: ChatRoomService) : ChatRoomApi {
         return try {
             val ent = service.addGroupMember(dto)
             val dto = modelMapper.map(ent, ChatRoomDTO::class.java)
-            val response = wrapInApiResponse(dto)
+            val response = wrapInSuccessResponse(dto)
             logger.info("add group member response: $response")
             response
         } catch (e: NoSuchElementException) {
@@ -193,7 +169,7 @@ class ChatRoomApiImpl(@Inject var service: ChatRoomService) : ChatRoomApi {
         return try {
             val ent = service.removeGroupMember(dto)
             val dto = modelMapper.map(ent, ChatRoomDTO::class.java)
-            val response = wrapInApiResponse(dto)
+            val response = wrapInSuccessResponse(dto)
             logger.info("remove group member response: $response")
             response
         } catch (e: NoSuchElementException) {
@@ -209,7 +185,7 @@ class ChatRoomApiImpl(@Inject var service: ChatRoomService) : ChatRoomApi {
         return try {
             val ent = service.changeGroupName(dto)
             val dto = modelMapper.map(ent, ChatRoomDTO::class.java)
-            val response = wrapInApiResponse(dto)
+            val response = wrapInSuccessResponse(dto)
             logger.info("change group name response: $response")
             response
         } catch (e: NoSuchElementException) {

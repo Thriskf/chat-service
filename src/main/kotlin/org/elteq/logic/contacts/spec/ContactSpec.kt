@@ -14,12 +14,6 @@ class ContactSpec : PaginationDto() {
     @QueryParam("contactType")
     var contactType: ContactType? = null
 
-    @QueryParam("from")
-    var from: LocalDateTime? = null
-
-    @QueryParam("to")
-    var to: LocalDateTime? = null
-
     override fun toMap(): Map<String, Any> {
         val params = mutableMapOf<String, Any>()
 

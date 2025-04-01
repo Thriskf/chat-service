@@ -2,16 +2,17 @@ package org.elteq.logic.chatRoom.service
 
 
 import io.quarkus.hibernate.orm.panache.PanacheQuery
-import org.elteq.logic.chatRoom.db.ChatRoom
+import org.elteq.base.apiResponse.domain.ApiResponse
+import org.elteq.logic.chatRoom.models.ChatRoom
+import org.elteq.logic.chatRoom.dtos.*
 import org.elteq.logic.chatRoom.enums.ChatRoomType
-import org.elteq.logic.chatRoom.models.*
 import org.elteq.logic.chatRoom.spec.ChatRoomSpec
 
 interface ChatRoomService {
-    fun add(dto: ChatRoomAddDTO): ChatRoom
+    fun add(dto: ChatRoomAddDTO): ChatRoomResponse
     fun getById(id: String): ChatRoom?
     fun addMessage(dto: ChatRoomAddMessageDTO): ChatRoom?
-    fun filter(spec: ChatRoomSpec): PanacheQuery<ChatRoom>
+    fun filter(spec: ChatRoomSpec): ChatRoomPaginatedResponse
     fun delete(id: String): String
     fun deleteAll(): String
     fun count(): Long

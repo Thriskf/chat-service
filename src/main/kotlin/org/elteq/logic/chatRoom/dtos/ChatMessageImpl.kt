@@ -1,4 +1,4 @@
-package org.elteq.logic.messages.ws
+package org.elteq.logic.chatRoom.dtos
 
 import io.smallrye.mutiny.Uni
 import io.smallrye.mutiny.infrastructure.Infrastructure
@@ -10,9 +10,9 @@ import jakarta.websocket.server.PathParam
 import jakarta.websocket.server.ServerEndpoint
 import org.elteq.logic.chatRoom.service.ChatRoomService
 import org.elteq.logic.messages.service.MessageService
+import org.elteq.logic.messages.ws.ChatMessage
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Consumer

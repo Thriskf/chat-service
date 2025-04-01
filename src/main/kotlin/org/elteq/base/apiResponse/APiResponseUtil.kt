@@ -1,12 +1,14 @@
 package org.elteq.base.apiResponse
 
+import io.quarkus.panache.common.Page
 import org.elteq.base.apiResponse.domain.ApiResponse
 import org.elteq.base.apiResponse.domain.ErrorResponse
+import org.elteq.base.apiResponse.domain.PagedContent
 import org.elteq.base.apiResponse.domain.ResponseMessage.FAIL
 import org.elteq.base.apiResponse.domain.ResponseMessage.SUCCESS
 
 
-fun <T> wrapInApiResponse(data: T): ApiResponse<T> {
+fun <T> wrapInSuccessResponse(data: T): ApiResponse<T> {
     return ApiResponse(
         code = SUCCESS.code,
         message = SUCCESS.message,

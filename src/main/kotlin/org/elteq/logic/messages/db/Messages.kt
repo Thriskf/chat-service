@@ -5,13 +5,12 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase
 import jakarta.json.bind.annotation.JsonbTransient
 import jakarta.persistence.*
 import jakarta.persistence.CascadeType.ALL
-import org.elteq.logic.chatRoom.db.ChatRoom
+import org.elteq.logic.chatRoom.models.ChatRoom
 import org.elteq.logic.users.db.Users
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.io.Serializable
 import java.time.LocalDateTime
-import java.util.*
 
 @Entity
 @Table(

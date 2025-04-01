@@ -1,8 +1,7 @@
-package org.elteq.logic.chatRoom.models
+package org.elteq.logic.chatRoom.dtos
 
 import jakarta.validation.constraints.NotBlank
 import kotlinx.serialization.Serializable
-import java.util.*
 
 @Serializable
 data class ChatRoomAddMessageDTO (

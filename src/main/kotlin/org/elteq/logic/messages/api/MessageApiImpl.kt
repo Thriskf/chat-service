@@ -5,7 +5,7 @@ import jakarta.ws.rs.core.Response
 import org.elteq.base.apiResponse.GenericHttpResponse.Companion.wrapApiResponse
 import org.elteq.base.apiResponse.domain.ApiResponse
 import org.elteq.base.apiResponse.wrapFailureInResponse
-import org.elteq.base.apiResponse.wrapInApiResponse
+import org.elteq.base.apiResponse.wrapInSuccessResponse
 import org.elteq.base.exception.ServiceException
 import org.elteq.base.utils.MapperUtil.Mapper
 import org.elteq.logic.messages.db.Messages
@@ -27,7 +27,7 @@ class MessageApiImpl(@Inject var service: MessageService) : MessageApi {
         try {
             val ent = service.add(dto)
             val dto = modelMapper.map(ent, MessageDTO::class.java)
-            val response = wrapInApiResponse(dto)
+            val response = wrapInSuccessResponse(dto)
             logger.info("added new message response: $response")
             return response
         } catch (e: Exception) {
@@ -41,7 +41,7 @@ class MessageApiImpl(@Inject var service: MessageService) : MessageApi {
         try {
             val ent = service.getById(id)
             val dto = modelMapper.map(ent, MessageDTO::class.java)
-            val response = wrapInApiResponse(dto)
+            val response = wrapInSuccessResponse(dto)
             logger.info("get message response :: $response")
             return response
         } catch (e: NoSuchElementException) {
@@ -62,7 +62,7 @@ class MessageApiImpl(@Inject var service: MessageService) : MessageApi {
                 modelMapper.map(it, MessageDTO::class.java)
             }.collect(Collectors.toList())
             logger.info("mapped message :: $dtos")
-            val response = wrapInApiResponse(dtos)
+            val response = wrapInSuccessResponse(dtos)
             logger.info("filter message response :: $response")
             return response
         } catch (e: Exception) {
@@ -80,7 +80,7 @@ class MessageApiImpl(@Inject var service: MessageService) : MessageApi {
             }.collect(Collectors.toList())
 
             logger.info("mapped message :: $dtos")
-            val response = wrapInApiResponse(dtos)
+            val response = wrapInSuccessResponse(dtos)
             logger.info("get message by user response :: $response")
             return response
         } catch (e: NoSuchElementException) {

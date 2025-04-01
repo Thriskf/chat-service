@@ -8,8 +8,8 @@ import jakarta.ws.rs.core.Response
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.elteq.base.apiResponse.domain.ApiResponse
+import org.elteq.logic.chatRoom.dtos.*
 import org.elteq.logic.chatRoom.enums.ChatRoomType
-import org.elteq.logic.chatRoom.models.*
 import org.elteq.logic.chatRoom.spec.ChatRoomSpec
 
 @Path("/api/v1/chat-room")
@@ -21,14 +21,14 @@ import org.elteq.logic.chatRoom.spec.ChatRoomSpec
 interface ChatRoomApi {
 
     @POST
-    fun add(@Valid dto: ChatRoomAddDTO): ApiResponse<ChatRoomDTO>
+    fun add(@Valid dto: ChatRoomAddDTO): ChatRoomResponse
 
     @GET
     @Path("/{id}")
     fun getById(@PathParam("id") id: String): ApiResponse<ChatRoomDTO>
 
     @GET
-    fun search(@BeanParam spec: ChatRoomSpec): ApiResponse<List<ChatRoomDTO>>
+    fun search(@BeanParam spec: ChatRoomSpec): ChatRoomPaginatedResponse
 
     @DELETE
     @Path("/{id}")

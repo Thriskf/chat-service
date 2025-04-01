@@ -23,11 +23,7 @@ class UserSpec : PaginationDto() {
 //    @QueryParam("specialty")
 //    var specialty: Specialty? = null
 //
-    @QueryParam("from")
-    var from: LocalDateTime? = null
 
-    @QueryParam("to")
-    var to: LocalDateTime? = null
 
     override fun toMap(): Map<String, Any> {
         val params = mutableMapOf<String, Any>()
@@ -44,10 +40,6 @@ class UserSpec : PaginationDto() {
         to?.let { params["to"] = to!! }
 
         return params
-    }
-
-    override fun toString(): String {
-        return "UserSpec(status=$status, from=$from, to=$to)"
     }
 
 
