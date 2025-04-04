@@ -158,9 +158,21 @@ class ChatRoomServiceImpl(@Inject var repo: ChatRoomRepository) : ChatRoomServic
     }
 
     override fun delete(id: String): String {
-        val ent = getById(id)
-        repo.delete(ent)
-        return "Chat room with id '$id' deleted."
+        logger.info("deleting chat room $id")
+        return runCatching {
+            val ent = getById(id)
+            ent?.deleted = true
+            repo.entityManager.merge(ent)
+        }.fold(
+            onSuccess = {
+                logger.info("Successfully deleted chat room $id")
+                "Chat room $id deleted successfully"
+            }, onFailure = {
+                logger.error("Could not delete chat room $id", it)
+                "Could not delete chat room $id"
+            }
+        )
+
     }
 
     override fun deleteAll(): String {

@@ -20,7 +20,9 @@ import java.util.*
     indexes = [
         Index(name = "idx_contact_user_id", columnList = "user_id"),
         Index(name = "idx_contact_value", columnList = "contact_value"),
-        Index(name = "idx_contact_type", columnList = "type")
+        Index(name = "idx_contact_type", columnList = "type"),
+        Index(name = "idx_deleted", columnList = "deleted"),
+
     ]
 )
 class Contact : PanacheEntityBase(), Serializable {
@@ -45,6 +47,9 @@ class Contact : PanacheEntityBase(), Serializable {
     @NotNull
     @Column(name = "is_contactable")
     var isContactable: Boolean = true
+
+    @Column(name = "deleted")
+    var deleted: Boolean = false
 
     @CreationTimestamp
     @Column(name = "created_on")

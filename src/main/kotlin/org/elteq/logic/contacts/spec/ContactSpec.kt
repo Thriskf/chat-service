@@ -21,6 +21,7 @@ class ContactSpec : PaginationDto() {
         contactType?.let { params["contactType"] = contactType!! }
         from?.let { params["from"] = from!! }
         to?.let { params["to"] = to!! }
+        deleted?.let { params["deleted"] = deleted!! }
 
         return params
     }

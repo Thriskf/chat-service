@@ -85,10 +85,22 @@ class MessageServiceImpl(@Inject var repo: MessageRepository) : MessageService {
 
     override fun delete(id: String): String {
         logger.info("Deleting message with id: $id")
-        val ent = getById(id)
-        repo.delete(ent)
-        logger.info("Message with id '$id' deleted.")
-        return "Message with id '$id' deleted."
+
+        return runCatching {
+            val ent = getById(id)
+            ent?.deleted = true
+            repo.entityManager.merge(ent)
+        }.fold(
+            onSuccess = {
+                logger.info("Deleted message with id: $id")
+                "Deleted message with id: $id"
+            },
+            onFailure = {
+                logger.error("Error while deleting message with id $id", it)
+                "Could not delete message with id: $id"
+            }
+        )
+
     }
 
     override fun deleteAll(): String {

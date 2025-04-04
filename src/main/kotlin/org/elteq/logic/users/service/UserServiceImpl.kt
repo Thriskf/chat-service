@@ -178,9 +178,23 @@ class UserServiceImpl(@Inject var repo: UserRepository) : UserService {
     }
 
     override fun delete(id: String): String {
-        val ent = getById(id)
-        repo.delete(ent)
-        return "User $id deleted"
+
+        return runCatching {
+            val ent = getById(id)
+            ent.deleted = true
+            ent.contacts?.forEach {
+                it.deleted = true
+                it.persistAndFlush()
+            }
+
+            repo.entityManager.merge(ent)
+        }.fold(onSuccess = {
+            "User deleted: ${it.id} was successfully deleted"
+        }, onFailure = {
+            logger.error("Error deleting user", it)
+            "Could not delete user with id $id."
+        })
+
     }
 
     override fun deleteAll(): String {

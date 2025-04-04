@@ -15,10 +15,10 @@ import java.time.LocalDateTime
 @Entity
 @Table(
     name = "tbl_messages",
-//    indexes = [
-//        Index(name = "index_doctor_email", columnList = "email", unique = true),
+    indexes = [
+        Index(name = "idx_deleted", columnList = "deleted"),
 //        Index(name = "index_doctor_msisdn", columnList = "phone_number", unique = true)
-//    ]
+    ]
 )
 class Messages : PanacheEntityBase(), Serializable {
     @Id
@@ -38,6 +38,9 @@ class Messages : PanacheEntityBase(), Serializable {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     var user: Users? = null
 
+    @Column(name = "deleted")
+    var deleted: Boolean = false
+
     @CreationTimestamp
     @Column(name = "created_on")
     var createdOn: LocalDateTime? = null
@@ -47,6 +50,6 @@ class Messages : PanacheEntityBase(), Serializable {
     var updatedOn: LocalDateTime? = null
 
     override fun toString(): String {
-        return "Messages(id=$id, createdOn=$createdOn, updatedOn=$updatedOn)"
+        return "Messages(id=$id, deleted=$deleted createdOn=$createdOn, updatedOn=$updatedOn)"
     }
 }
