@@ -1,8 +1,7 @@
-package org.elteq.logic.users.models
+package org.elteq.logic.users.dtos
 
 import jakarta.validation.constraints.NotBlank
 import kotlinx.serialization.Serializable
-import java.util.*
 
 @Serializable
 data class UserUpdateNameDTO(

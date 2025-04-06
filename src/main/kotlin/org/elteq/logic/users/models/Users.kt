@@ -1,4 +1,4 @@
-package org.elteq.logic.users.db
+package org.elteq.logic.users.models
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase
@@ -6,8 +6,8 @@ import jakarta.json.bind.annotation.JsonbTransient
 import jakarta.persistence.*
 import jakarta.persistence.CascadeType.ALL
 import org.elteq.logic.chatRoom.models.ChatRoom
-import org.elteq.logic.contacts.db.Contact
-import org.elteq.logic.messages.db.Messages
+import org.elteq.logic.contacts.models.Contact
+import org.elteq.logic.messages.models.Messages
 import org.elteq.logic.users.enums.Gender
 import org.elteq.logic.users.enums.Status
 import org.hibernate.annotations.CreationTimestamp

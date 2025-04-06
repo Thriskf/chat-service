@@ -7,13 +7,12 @@ import jakarta.persistence.*
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotNull
-import org.elteq.logic.users.db.Users
+import org.elteq.logic.users.models.Users
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.io.Serializable
 import java.time.LocalDateTime
 import java.time.Month
-import java.util.*
 
 @Entity
 @Table(

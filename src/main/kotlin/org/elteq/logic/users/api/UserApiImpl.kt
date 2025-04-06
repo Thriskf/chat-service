@@ -9,8 +9,8 @@ import org.elteq.base.apiResponse.wrapFailureInResponse
 import org.elteq.base.apiResponse.wrapInSuccessResponse
 import org.elteq.base.exception.ServiceException
 import org.elteq.base.utils.MapperUtil.Mapper
-import org.elteq.logic.users.db.Users
-import org.elteq.logic.users.models.*
+import org.elteq.logic.users.models.Users
+import org.elteq.logic.users.dtos.*
 import org.elteq.logic.users.service.UserService
 import org.elteq.logic.users.spec.UserSpec
 import org.slf4j.Logger

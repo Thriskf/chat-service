@@ -32,6 +32,23 @@
                 <scope>import</scope>
             </dependency>
 
+               <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-mailer</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-security</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
+        </dependency>
+
 <!--            <dependency>-->
 <!--                <groupId>io.quarkus</groupId>-->
 <!--                <artifactId>quarkus-bom</artifactId>-->

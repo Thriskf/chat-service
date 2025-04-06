@@ -6,8 +6,8 @@ import jakarta.json.bind.annotation.JsonbTransient
 import jakarta.persistence.*
 import jakarta.persistence.CascadeType.ALL
 import org.elteq.logic.chatRoom.enums.ChatRoomType
-import org.elteq.logic.messages.db.Messages
-import org.elteq.logic.users.db.Users
+import org.elteq.logic.messages.models.Messages
+import org.elteq.logic.users.models.Users
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.io.Serializable

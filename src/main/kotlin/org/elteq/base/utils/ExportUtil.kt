@@ -3,7 +3,7 @@ package org.elteq.base.utils
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVPrinter
 import org.elteq.base.exception.ServiceException
-import org.elteq.logic.contacts.db.Contact
+import org.elteq.logic.contacts.models.Contact
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.StringWriter

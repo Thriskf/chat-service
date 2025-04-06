@@ -8,9 +8,9 @@ import org.elteq.base.apiResponse.wrapFailureInResponse
 import org.elteq.base.apiResponse.wrapInSuccessResponse
 import org.elteq.base.exception.ServiceException
 import org.elteq.base.utils.MapperUtil.Mapper
-import org.elteq.logic.messages.db.Messages
-import org.elteq.logic.messages.models.MessageAddDTO
-import org.elteq.logic.messages.models.MessageDTO
+import org.elteq.logic.messages.models.Messages
+import org.elteq.logic.messages.dtos.MessageAddDTO
+import org.elteq.logic.messages.dtos.MessageDTO
 import org.elteq.logic.messages.service.MessageService
 import org.elteq.logic.messages.spec.MessageSpec
 import org.slf4j.Logger

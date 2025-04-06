@@ -1,7 +1,7 @@
 package org.elteq.logic.chatRoom.dtos
 
 import kotlinx.serialization.Serializable
-import org.elteq.logic.messages.models.MessageDTO
+import org.elteq.logic.messages.dtos.MessageDTO
 import java.time.LocalDateTime
 
 

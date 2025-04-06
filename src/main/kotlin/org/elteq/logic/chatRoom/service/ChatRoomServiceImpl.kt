@@ -13,8 +13,8 @@ import org.elteq.logic.chatRoom.enums.ChatRoomType
 import org.elteq.logic.chatRoom.models.ChatRoom
 import org.elteq.logic.chatRoom.models.ChatRoomRepository
 import org.elteq.logic.chatRoom.spec.ChatRoomSpec
-import org.elteq.logic.messages.db.Messages
-import org.elteq.logic.users.db.Users
+import org.elteq.logic.messages.models.Messages
+import org.elteq.logic.users.models.Users
 import org.elteq.logic.users.service.UserService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

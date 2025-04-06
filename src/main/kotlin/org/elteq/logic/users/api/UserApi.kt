@@ -8,7 +8,7 @@ import jakarta.ws.rs.core.Response
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.elteq.base.apiResponse.domain.ApiResponse
-import org.elteq.logic.users.models.*
+import org.elteq.logic.users.dtos.*
 import org.elteq.logic.users.spec.UserSpec
 
 @Path("/api/v1/user")

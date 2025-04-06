@@ -1,4 +1,4 @@
-package org.elteq.logic.users.db
+package org.elteq.logic.users.models
 
 import io.quarkus.hibernate.orm.panache.PanacheQuery
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase

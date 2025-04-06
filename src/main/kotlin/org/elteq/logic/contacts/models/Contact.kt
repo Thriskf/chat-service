@@ -1,4 +1,4 @@
-package org.elteq.logic.contacts.db
+package org.elteq.logic.contacts.models
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase
@@ -7,12 +7,11 @@ import jakarta.persistence.*
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
 import org.elteq.logic.contacts.enums.ContactType
-import org.elteq.logic.users.db.Users
+import org.elteq.logic.users.models.Users
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.io.Serializable
 import java.time.LocalDateTime
-import java.util.*
 
 @Entity
 @Table(

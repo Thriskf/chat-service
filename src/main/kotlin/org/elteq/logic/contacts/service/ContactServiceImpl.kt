@@ -5,8 +5,8 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
 import org.elteq.base.exception.ServiceException
-import org.elteq.logic.contacts.db.Contact
-import org.elteq.logic.contacts.db.ContactRepository
+import org.elteq.logic.contacts.models.Contact
+import org.elteq.logic.contacts.models.ContactRepository
 import org.elteq.logic.contacts.enums.ContactType
 import org.elteq.logic.contacts.spec.ContactSpec
 

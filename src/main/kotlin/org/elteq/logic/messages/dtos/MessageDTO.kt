@@ -1,7 +1,7 @@
-package org.elteq.logic.messages.models
+package org.elteq.logic.messages.dtos
 
 import kotlinx.serialization.Serializable
-import org.elteq.logic.users.models.UserDTOWithoutContact
+import org.elteq.logic.users.dtos.UserDTOWithoutContact
 import java.time.LocalDateTime
 
 @Serializable

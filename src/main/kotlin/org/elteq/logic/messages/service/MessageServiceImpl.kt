@@ -6,10 +6,10 @@ import jakarta.enterprise.inject.Default
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
 import org.elteq.logic.chatRoom.service.ChatRoomService
-import org.elteq.logic.messages.db.MessageRepository
-import org.elteq.logic.messages.db.Messages
-import org.elteq.logic.messages.models.MessageAddDTO
-import org.elteq.logic.messages.models.MessageUpdateDTO
+import org.elteq.logic.messages.models.MessageRepository
+import org.elteq.logic.messages.models.Messages
+import org.elteq.logic.messages.dtos.MessageAddDTO
+import org.elteq.logic.messages.dtos.MessageUpdateDTO
 import org.elteq.logic.messages.spec.MessageSpec
 import org.elteq.logic.users.service.UserService
 import org.slf4j.Logger

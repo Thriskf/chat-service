@@ -1,4 +1,4 @@
-package org.elteq.logic.messages.db
+package org.elteq.logic.messages.models
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase
@@ -6,8 +6,10 @@ import jakarta.json.bind.annotation.JsonbTransient
 import jakarta.persistence.*
 import jakarta.persistence.CascadeType.ALL
 import org.elteq.logic.chatRoom.models.ChatRoom
-import org.elteq.logic.users.db.Users
+import org.elteq.logic.users.models.Users
 import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.GenericGenerator
+import org.hibernate.annotations.Parameter
 import org.hibernate.annotations.UpdateTimestamp
 import java.io.Serializable
 import java.time.LocalDateTime
@@ -23,6 +25,13 @@ import java.time.LocalDateTime
 class Messages : PanacheEntityBase(), Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @GenericGenerator(
+        name = "prefixed_uuid4",
+        parameters = [
+            Parameter(name = "strategy", value = "random"),
+            Parameter(name = "prefix", value = "MSG_")
+        ]
+    )
     var id: String? = null
 
     @JsonIgnore
@@ -31,7 +40,7 @@ class Messages : PanacheEntityBase(), Serializable {
     @JoinColumn(name = "room_id", nullable = false)
     var chatRoom: ChatRoom? = null
 
-    @Column(name = "message")
+    @Column(name = "message", columnDefinition = "text")
     var message: String? = null
 
     @ManyToOne(cascade = [ALL], fetch = FetchType.EAGER)

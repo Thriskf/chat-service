@@ -1,11 +1,9 @@
-package org.elteq.logic.users.models
+package org.elteq.logic.users.dtos
 
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.NotNull
 import kotlinx.serialization.Serializable
 import org.elteq.base.validators.ValidPhoneNumber
-import org.elteq.logic.dob.models.DoBDTO
 import org.elteq.logic.users.enums.Gender
 
 @Serializable
