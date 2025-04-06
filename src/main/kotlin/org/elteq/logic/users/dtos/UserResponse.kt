@@ -10,3 +10,9 @@ class UserResponse(data: List<UserDTO>?) : BaseResponse() {
 class UserPaginatedResponse(data: List<UserDTO>?) : PaginatedBaseResponse() {
     val data: List<UserDTO>? = data
 }
+
+
+class UserLoginResponse(data: UserDTO?) : BaseResponse() {
+    val data: UserDTO? = data
+    var token: String? = null
+}

@@ -15,6 +15,8 @@ data class UserDTO(
     var otherName: String? = null,
     var displayName: String? = null,
     var status: Status? = null,
+    var fcp: Boolean? = null,
+    var firstLogin :Boolean? = null,
     var contacts: Set<Contact>? = null,
     var gender: Gender? = null,
     var createdOn: LocalDateTime? = null,

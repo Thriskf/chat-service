@@ -16,16 +16,19 @@ class JwtUtils {
     @ConfigProperty(name = "token.issuer")
     private lateinit var issuer: String
 
-    fun generateToken(roles: Set<String?>?, dto: Users, email: String, displayName: String): String {
+    fun generateToken(user:Users,email: String): String {
         val tokenExpiryDuration = Duration.ofHours(5)
         val expiryTime = Instant.now().plus(tokenExpiryDuration)
 
         return Jwt.issuer(issuer) // Set the issuer
             .upn(email) // Set the "upn" (User Principal Name) claim
             .subject(email) // Set the subject (username)
-            .groups(roles) // Add roles as groups
+//            .groups(roles) // Add roles as groups
             .claim("email", email) // Add custom claim for email
-            .claim("displayName", displayName)
+            .claim("displayName", user.displayName)
+            .claim("firstName", user.firstName)
+            .claim("lastName", user.lastName)
+            .claim("gender", user.gender)
             .expiresAt(expiryTime) // Set token expiry time
             .sign() // Sign and generate the token
     }

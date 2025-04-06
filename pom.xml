@@ -47,6 +47,17 @@
 
             <dependency>
                 <groupId>io.quarkus</groupId>
+                <artifactId>quarkus-smallrye-jwt-build</artifactId>
+<!--                <version>3.2.9.Final</version>-->
+            </dependency>
+            <dependency>
+                <groupId>io.quarkus</groupId>
+                <artifactId>quarkus-smallrye-jwt</artifactId>
+                <version>3.9.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.quarkus</groupId>
                 <artifactId>quarkus-security</artifactId>
             </dependency>
 
