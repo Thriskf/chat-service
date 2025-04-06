@@ -8,8 +8,8 @@ import jakarta.ws.rs.core.Response
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.elteq.base.apiResponse.domain.ApiResponse
-import org.elteq.logic.messages.models.MessageAddDTO
-import org.elteq.logic.messages.models.MessageDTO
+import org.elteq.logic.messages.dtos.MessageAddDTO
+import org.elteq.logic.messages.dtos.MessageDTO
 import org.elteq.logic.messages.spec.MessageSpec
 
 @Path("/api/v1/message")

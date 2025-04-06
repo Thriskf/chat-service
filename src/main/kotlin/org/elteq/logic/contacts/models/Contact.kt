@@ -1,4 +1,4 @@
-package org.elteq.logic.contacts.db
+package org.elteq.logic.contacts.models
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase
@@ -7,12 +7,11 @@ import jakarta.persistence.*
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
 import org.elteq.logic.contacts.enums.ContactType
-import org.elteq.logic.users.db.Users
+import org.elteq.logic.users.models.Users
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.io.Serializable
 import java.time.LocalDateTime
-import java.util.*
 
 @Entity
 @Table(
@@ -20,7 +19,9 @@ import java.util.*
     indexes = [
         Index(name = "idx_contact_user_id", columnList = "user_id"),
         Index(name = "idx_contact_value", columnList = "contact_value"),
-        Index(name = "idx_contact_type", columnList = "type")
+        Index(name = "idx_contact_type", columnList = "type"),
+        Index(name = "idx_deleted", columnList = "deleted"),
+
     ]
 )
 class Contact : PanacheEntityBase(), Serializable {
@@ -45,6 +46,9 @@ class Contact : PanacheEntityBase(), Serializable {
     @NotNull
     @Column(name = "is_contactable")
     var isContactable: Boolean = true
+
+    @Column(name = "deleted")
+    var deleted: Boolean = false
 
     @CreationTimestamp
     @Column(name = "created_on")

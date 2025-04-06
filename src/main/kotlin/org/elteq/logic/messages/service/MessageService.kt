@@ -2,9 +2,9 @@ package org.elteq.logic.messages.service
 
 
 import io.quarkus.hibernate.orm.panache.PanacheQuery
-import org.elteq.logic.messages.db.Messages
-import org.elteq.logic.messages.models.MessageAddDTO
-import org.elteq.logic.messages.models.MessageUpdateDTO
+import org.elteq.logic.messages.models.Messages
+import org.elteq.logic.messages.dtos.MessageAddDTO
+import org.elteq.logic.messages.dtos.MessageUpdateDTO
 import org.elteq.logic.messages.spec.MessageSpec
 
 interface MessageService {

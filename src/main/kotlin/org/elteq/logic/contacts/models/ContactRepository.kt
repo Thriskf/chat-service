@@ -1,4 +1,4 @@
-package org.elteq.logic.contacts.db
+package org.elteq.logic.contacts.models
 
 import io.quarkus.hibernate.orm.panache.PanacheQuery
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase
@@ -6,7 +6,6 @@ import jakarta.enterprise.context.ApplicationScoped
 import org.elteq.base.utils.PaginatedQuery
 import org.elteq.logic.contacts.enums.ContactType
 import org.elteq.logic.contacts.spec.ContactSpec
-import java.util.*
 
 
 @ApplicationScoped

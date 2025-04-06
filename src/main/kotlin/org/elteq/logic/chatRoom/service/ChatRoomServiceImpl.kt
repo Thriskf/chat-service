@@ -13,8 +13,8 @@ import org.elteq.logic.chatRoom.enums.ChatRoomType
 import org.elteq.logic.chatRoom.models.ChatRoom
 import org.elteq.logic.chatRoom.models.ChatRoomRepository
 import org.elteq.logic.chatRoom.spec.ChatRoomSpec
-import org.elteq.logic.messages.db.Messages
-import org.elteq.logic.users.db.Users
+import org.elteq.logic.messages.models.Messages
+import org.elteq.logic.users.models.Users
 import org.elteq.logic.users.service.UserService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -158,9 +158,21 @@ class ChatRoomServiceImpl(@Inject var repo: ChatRoomRepository) : ChatRoomServic
     }
 
     override fun delete(id: String): String {
-        val ent = getById(id)
-        repo.delete(ent)
-        return "Chat room with id '$id' deleted."
+        logger.info("deleting chat room $id")
+        return runCatching {
+            val ent = getById(id)
+            ent?.deleted = true
+            repo.entityManager.merge(ent)
+        }.fold(
+            onSuccess = {
+                logger.info("Successfully deleted chat room $id")
+                "Chat room $id deleted successfully"
+            }, onFailure = {
+                logger.error("Could not delete chat room $id", it)
+                "Could not delete chat room $id"
+            }
+        )
+
     }
 
     override fun deleteAll(): String {

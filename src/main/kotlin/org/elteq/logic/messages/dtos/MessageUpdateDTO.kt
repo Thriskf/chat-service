@@ -1,9 +1,8 @@
-package org.elteq.logic.messages.models
+package org.elteq.logic.messages.dtos
 
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import kotlinx.serialization.Serializable
-import java.util.*
 
 @Serializable
 data class MessageUpdateDTO (

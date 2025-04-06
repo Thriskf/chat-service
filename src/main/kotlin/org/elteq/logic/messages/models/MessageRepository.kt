@@ -1,4 +1,4 @@
-package org.elteq.logic.messages.db
+package org.elteq.logic.messages.models
 
 import io.quarkus.hibernate.orm.panache.PanacheQuery
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase

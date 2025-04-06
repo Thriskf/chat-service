@@ -6,10 +6,10 @@ import jakarta.enterprise.inject.Default
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
 import org.elteq.logic.chatRoom.service.ChatRoomService
-import org.elteq.logic.messages.db.MessageRepository
-import org.elteq.logic.messages.db.Messages
-import org.elteq.logic.messages.models.MessageAddDTO
-import org.elteq.logic.messages.models.MessageUpdateDTO
+import org.elteq.logic.messages.models.MessageRepository
+import org.elteq.logic.messages.models.Messages
+import org.elteq.logic.messages.dtos.MessageAddDTO
+import org.elteq.logic.messages.dtos.MessageUpdateDTO
 import org.elteq.logic.messages.spec.MessageSpec
 import org.elteq.logic.users.service.UserService
 import org.slf4j.Logger
@@ -85,10 +85,22 @@ class MessageServiceImpl(@Inject var repo: MessageRepository) : MessageService {
 
     override fun delete(id: String): String {
         logger.info("Deleting message with id: $id")
-        val ent = getById(id)
-        repo.delete(ent)
-        logger.info("Message with id '$id' deleted.")
-        return "Message with id '$id' deleted."
+
+        return runCatching {
+            val ent = getById(id)
+            ent?.deleted = true
+            repo.entityManager.merge(ent)
+        }.fold(
+            onSuccess = {
+                logger.info("Deleted message with id: $id")
+                "Deleted message with id: $id"
+            },
+            onFailure = {
+                logger.error("Error while deleting message with id $id", it)
+                "Could not delete message with id: $id"
+            }
+        )
+
     }
 
     override fun deleteAll(): String {

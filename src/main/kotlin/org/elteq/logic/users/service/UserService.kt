@@ -2,11 +2,12 @@ package org.elteq.logic.users.service
 
 
 import io.quarkus.hibernate.orm.panache.PanacheQuery
-import net.bytebuddy.implementation.bytecode.ShiftRight
-import org.elteq.logic.users.db.Users
-import org.elteq.logic.users.models.*
+import org.elteq.logic.users.models.Users
+import org.elteq.logic.users.dtos.UserAddDTO
+import org.elteq.logic.users.dtos.UserUpdateContactDTO
+import org.elteq.logic.users.dtos.UserUpdateNameDTO
+import org.elteq.logic.users.dtos.UserUpdateStatusDTO
 import org.elteq.logic.users.spec.UserSpec
-import java.util.*
 
 interface UserService {
     fun add(dto: UserAddDTO): Users

@@ -4,18 +4,17 @@ import io.quarkus.hibernate.orm.panache.PanacheQuery
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.inject.Default
 import jakarta.inject.Inject
-import jakarta.inject.Singleton
 import jakarta.transaction.Transactional
 import org.elteq.base.exception.ServiceException
 import org.elteq.base.utils.ExportUtil
 import org.elteq.base.utils.MapperUtil.Mapper
-import org.elteq.logic.contacts.db.Contact
+import org.elteq.logic.contacts.models.Contact
 import org.elteq.logic.contacts.enums.ContactType
 import org.elteq.logic.contacts.service.ContactService
 import org.elteq.logic.dob.servcice.DoBService
-import org.elteq.logic.users.db.UserRepository
-import org.elteq.logic.users.db.Users
-import org.elteq.logic.users.models.*
+import org.elteq.logic.users.models.UserRepository
+import org.elteq.logic.users.models.Users
+import org.elteq.logic.users.dtos.*
 import org.elteq.logic.users.spec.UserSpec
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -178,9 +177,23 @@ class UserServiceImpl(@Inject var repo: UserRepository) : UserService {
     }
 
     override fun delete(id: String): String {
-        val ent = getById(id)
-        repo.delete(ent)
-        return "User $id deleted"
+
+        return runCatching {
+            val ent = getById(id)
+            ent.deleted = true
+            ent.contacts?.forEach {
+                it.deleted = true
+                it.persistAndFlush()
+            }
+
+            repo.entityManager.merge(ent)
+        }.fold(onSuccess = {
+            "User deleted: ${it.id} was successfully deleted"
+        }, onFailure = {
+            logger.error("Error deleting user", it)
+            "Could not delete user with id $id."
+        })
+
     }
 
     override fun deleteAll(): String {

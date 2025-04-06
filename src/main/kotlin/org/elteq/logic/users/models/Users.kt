@@ -1,4 +1,4 @@
-package org.elteq.logic.users.db
+package org.elteq.logic.users.models
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase
@@ -6,8 +6,8 @@ import jakarta.json.bind.annotation.JsonbTransient
 import jakarta.persistence.*
 import jakarta.persistence.CascadeType.ALL
 import org.elteq.logic.chatRoom.models.ChatRoom
-import org.elteq.logic.contacts.db.Contact
-import org.elteq.logic.messages.db.Messages
+import org.elteq.logic.contacts.models.Contact
+import org.elteq.logic.messages.models.Messages
 import org.elteq.logic.users.enums.Gender
 import org.elteq.logic.users.enums.Status
 import org.hibernate.annotations.CreationTimestamp
@@ -18,10 +18,10 @@ import java.time.LocalDateTime
 @Entity
 @Table(
     name = "tbl_users",
-//    indexes = [
-//        Index(name = "index_doctor_email", columnList = "email", unique = true),
+    indexes = [
+        Index(name = "idx_deleted", columnList = "deleted"),
 //        Index(name = "index_doctor_msisdn", columnList = "phone_number", unique = true)
-//    ]
+    ]
 )
 class Users : PanacheEntityBase(), Serializable {
     @Id
@@ -67,6 +67,9 @@ class Users : PanacheEntityBase(), Serializable {
     @Enumerated(EnumType.STRING)
     var status: Status? = Status.UNVERIFIED
 
+    @Column(name = "deleted")
+    var deleted: Boolean = false
+
     @CreationTimestamp
     @Column(name = "created_on")
     var createdOn: LocalDateTime? = null
@@ -77,7 +80,7 @@ class Users : PanacheEntityBase(), Serializable {
 
     override fun toString(): String {
         return "Users(createdOn=$createdOn, id=$id, firstName=$firstName, lastName=$lastName, otherName=$otherName, gender=$gender, " +
-                "status=$status, " +
+                "status=$status, deleted=$deleted " +
                 "displayName=$displayName, updatedOn=$updatedOn, gender=$gender)"
     }
 

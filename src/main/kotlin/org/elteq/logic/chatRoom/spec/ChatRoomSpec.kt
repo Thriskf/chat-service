@@ -42,6 +42,7 @@ class ChatRoomSpec : PaginationDto() {
 //        executionStatus?.let { params["executionStatus"] = executionStatus!! }
         from?.let { params["from"] = from!! }
         to?.let { params["to"] = to!! }
+        deleted?.let { params["deleted"] = deleted!! }
 
         return params
     }
