@@ -12,6 +12,7 @@ import org.elteq.logic.users.enums.Gender
 import org.elteq.logic.users.enums.Status
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
+import sun.security.util.Password
 import java.io.Serializable
 import java.time.LocalDateTime
 
@@ -33,6 +34,9 @@ class Users : PanacheEntityBase(), Serializable {
 
     @Column(name = "last_name", nullable = false)
     var lastName: String? = null
+
+//    @Column(name = "email", nullable = false,unique = true)
+//    var email: String? = null
 
     @Column(name = "other_name")
     var otherName: String? = null
@@ -59,6 +63,10 @@ class Users : PanacheEntityBase(), Serializable {
 //    @JoinColumn(name = "date_of_birth_id", referencedColumnName = "id") // Foreign key column
 //    var dateOfBirth: DOB? = null
 
+    @OneToOne(mappedBy = "user", cascade = [ALL], fetch = FetchType.EAGER, orphanRemoval = true)
+    @JoinColumn(name = "password_id", referencedColumnName = "id")
+    var password : Credentials?= null
+
     @Column(name = "gender")
     @Enumerated(EnumType.STRING)
     var gender: Gender? = null
@@ -69,6 +77,9 @@ class Users : PanacheEntityBase(), Serializable {
 
     @Column(name = "deleted")
     var deleted: Boolean = false
+
+    @Column(name="force_change_password")
+    var fcp :Boolean = true
 
     @CreationTimestamp
     @Column(name = "created_on")

@@ -16,8 +16,8 @@ class PasswordUtils {
             return DigestUtils.sha512Hex(password)
         }
 
-        fun generateTemporaryPassword(): String {
-            return generateRandomPassword(8)
+        fun generateTemporaryPassword(length: Int): String {
+            return generateRandomPassword(length)
         }
     }
 }

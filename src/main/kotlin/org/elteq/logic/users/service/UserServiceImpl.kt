@@ -5,9 +5,15 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.inject.Default
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
+import org.elteq.base.apiResponse.domain.ResponseMessage
 import org.elteq.base.exception.ServiceException
 import org.elteq.base.utils.ExportUtil
 import org.elteq.base.utils.MapperUtil.Mapper
+import org.elteq.base.utils.PasswordUtils
+import org.elteq.base.utils.email.EmailDTO
+import org.elteq.base.utils.email.EmailService
+import org.elteq.logic.chatRoom.dtos.ChatRoomDTO
+import org.elteq.logic.chatRoom.dtos.ChatRoomResponse
 import org.elteq.logic.contacts.models.Contact
 import org.elteq.logic.contacts.enums.ContactType
 import org.elteq.logic.contacts.service.ContactService
@@ -15,6 +21,7 @@ import org.elteq.logic.dob.servcice.DoBService
 import org.elteq.logic.users.models.UserRepository
 import org.elteq.logic.users.models.Users
 import org.elteq.logic.users.dtos.*
+import org.elteq.logic.users.models.Credentials
 import org.elteq.logic.users.spec.UserSpec
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -22,12 +29,17 @@ import java.util.stream.Collectors
 
 @ApplicationScoped
 //@Singleton
-class UserServiceImpl(@Inject var repo: UserRepository) : UserService {
+class UserServiceImpl(
+    @Inject var repo: UserRepository,
+    @Inject var emailService: EmailService,
+) : UserService {
     @Inject
     @field:Default
     private lateinit var contactService: ContactService
 
     private val modelMapper = Mapper.mapper
+
+    private val passwordUtils = PasswordUtils
 
 
     @Inject
@@ -78,8 +90,26 @@ class UserServiceImpl(@Inject var repo: UserRepository) : UserService {
         email.user = ent
         contactSet.add(email)
 
+        val tmpPassword = passwordUtils.generateTemporaryPassword(10)
+        val passwordCredential = Credentials().apply {
+            this.user = ent
+            this.password = passwordUtils.hashPassword(tmpPassword)
+        }
+        passwordCredential.persistAndFlush()
+
+        ent.password = passwordCredential
+
         logger.info("user contact $contactSet")
         ent.contacts = contactSet
+
+        runCatching {
+            val emailDto = EmailDTO(email.value, "Signup Successful", tmpPassword)
+            emailService.sendEmail(emailDto)
+        }.fold(onSuccess = {
+            logger.info("User signup email sent successfully ${email.value}")
+        }, onFailure = {
+            logger.error("error occurred while sending signup email", it)
+        })
 
         repo.persist(ent)
         logger.info("User added: $ent")
@@ -236,6 +266,139 @@ class UserServiceImpl(@Inject var repo: UserRepository) : UserService {
         val excludedFields: Set<String> = setOf("contacts")
 
         return ExportUtil().generateCsv(data, UserDTO(), excludedFields)
+
+    }
+
+    @Transactional
+    override fun resetPassword(dto: UserForgetPasswordDTO): UserResponse {
+
+        val data = mutableListOf<UserDTO>()
+        var message = ResponseMessage.SUCCESS.message
+        var code = ResponseMessage.SUCCESS.code
+        var systemMessage = "Password reset successfully.New temporal password sent to email"
+        var systemCode = ResponseMessage.SUCCESS.code
+
+        logger.info("Reset User ${dto.email} password")
+
+        var tmpPassword: String? = null
+
+        val userResetResult = runCatching {
+            val user = dto.email?.let { getByContact(it) }
+
+            if (user == null) {
+                throw IllegalArgumentException("User not found")
+            }
+
+            tmpPassword = passwordUtils.generateTemporaryPassword(10)
+            user.password?.password = passwordUtils.hashPassword(tmpPassword!!)
+            user.fcp = true
+
+            repo.entityManager.merge(user)
+        }
+
+        userResetResult.fold(
+            onSuccess = {
+                logger.info("User password reset successful for ${dto.email}")
+            },
+            onFailure = {
+                logger.error("Password reset failed for ${dto.email}", it)
+                message = ResponseMessage.FAIL.message
+                code = ResponseMessage.FAIL.code
+                systemMessage = "Could not reset password"
+                systemCode = ResponseMessage.FAIL.code
+            }
+        )
+
+        if (userResetResult.isSuccess && tmpPassword != null) {
+            runCatching {
+                val emailDto = EmailDTO(dto.email, "Password Reset Successful", tmpPassword!!)
+                emailService.sendEmail(emailDto)
+            }.fold(
+                onSuccess = {
+                    logger.info("Password reset email sent to ${dto.email}")
+                },
+                onFailure = {
+                    logger.error("Failed to send password reset email to ${dto.email}", it)
+                }
+            )
+        }
+
+        val response = UserResponse(data)
+        response.code = code
+        response.systemCode = systemCode
+        response.message = systemMessage
+        response.message = message
+        return response
+
+    }
+
+    @Transactional
+    override fun updatePassword(dto: UserChangePasswordDTO): UserResponse {
+        logger.info("Updating user password for ${dto.userId}")
+
+        val data = mutableListOf<UserDTO>()
+        var message = ResponseMessage.SUCCESS.message
+        var code = ResponseMessage.SUCCESS.code
+        var systemMessage = "Password Changed successfully"
+        var systemCode = ResponseMessage.SUCCESS.code
+
+        val user = dto.userId?.let { getById(it) }
+        val hashedOldP = dto.currentPassword?.let { passwordUtils.hashPassword(it) }
+
+        if (hashedOldP != user?.password?.password) {
+            return UserResponse(data).apply {
+                code = ResponseMessage.FAIL.code
+                systemCode = ResponseMessage.FAIL.code
+                message = ResponseMessage.FAIL.message
+                this.message = "Password mismatch"
+            }
+        }
+
+        var email = ""
+
+        return runCatching {
+            user?.password?.password = dto.newPassword?.let { passwordUtils.hashPassword(it) }
+            repo.entityManager.merge(user)
+            modelMapper.map(user, UserDTO::class.java)
+        }.fold(
+            onSuccess = { dto ->
+                data.add(dto)
+
+                // Send email
+                runCatching {
+                    email = user?.contacts
+                        ?.firstOrNull { it.type == ContactType.EMAIL }
+                        ?.value.toString()
+
+                    val emailDto = EmailDTO(
+                        recipient = email,
+                        subject = "Password Change Confirmation",
+                        body = "Your password was successfully changed. If this wasn't you, please contact support immediately."
+                    )
+                    emailService.sendEmail(emailDto)
+                }.onSuccess {
+                    logger.info("Password change confirmation email sent to $email")
+                }.onFailure {
+                    logger.error("Failed to send password change confirmation email", it)
+                }
+
+
+                UserResponse(data).apply {
+                    this.code = code
+                    this.systemCode = systemCode
+                    this.message = message
+                }
+            },
+            onFailure = {
+                logger.error("Unable to change password", it)
+                UserResponse(data).apply {
+                    code = ResponseMessage.FAIL.code
+                    systemCode = ResponseMessage.FAIL.code
+                    message = ResponseMessage.FAIL.message
+                    this.message = "Could not change password"
+                }
+            }
+        )
 
     }
 
