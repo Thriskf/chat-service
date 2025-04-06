@@ -41,7 +41,6 @@ class UserServiceImpl(
 
     private val passwordUtils = PasswordUtils
 
-
     @Inject
     @field:Default
     private lateinit var dobService: DoBService
@@ -357,7 +356,13 @@ class UserServiceImpl(
         var email = ""
 
         return runCatching {
-            user?.password?.password = dto.newPassword?.let { passwordUtils.hashPassword(it) }
+            if (user?.firstLogin!!) {
+                user.firstLogin = false
+            }
+
+            user.password?.password = dto.newPassword?.let { passwordUtils.hashPassword(it) }
+            user.fcp = false
+
             repo.entityManager.merge(user)
             modelMapper.map(user, UserDTO::class.java)
         }.fold(

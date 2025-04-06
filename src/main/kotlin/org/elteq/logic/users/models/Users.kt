@@ -65,7 +65,7 @@ class Users : PanacheEntityBase(), Serializable {
 
     @OneToOne(mappedBy = "user", cascade = [ALL], fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "password_id", referencedColumnName = "id")
-    var password : Credentials?= null
+    var password: Credentials? = null
 
     @Column(name = "gender")
     @Enumerated(EnumType.STRING)
@@ -78,8 +78,11 @@ class Users : PanacheEntityBase(), Serializable {
     @Column(name = "deleted")
     var deleted: Boolean = false
 
-    @Column(name="force_change_password")
-    var fcp :Boolean = true
+    @Column(name = "force_change_password")
+    var fcp: Boolean = true
+
+    @Column(name = "first_login")
+    var firstLogin = true
 
     @CreationTimestamp
     @Column(name = "created_on")
@@ -88,11 +91,8 @@ class Users : PanacheEntityBase(), Serializable {
     @UpdateTimestamp
     @Column(name = "updated_on")
     var updatedOn: LocalDateTime? = null
-
     override fun toString(): String {
-        return "Users(createdOn=$createdOn, id=$id, firstName=$firstName, lastName=$lastName, otherName=$otherName, gender=$gender, " +
-                "status=$status, deleted=$deleted " +
-                "displayName=$displayName, updatedOn=$updatedOn, gender=$gender)"
+        return "Users(id=$id, firstName=$firstName, lastName=$lastName, otherName=$otherName, displayName=$displayName, gender=$gender, status=$status, deleted=$deleted, fcp=$fcp, firstLogin=$firstLogin, createdOn=$createdOn, updatedOn=$updatedOn)"
     }
 
 }
