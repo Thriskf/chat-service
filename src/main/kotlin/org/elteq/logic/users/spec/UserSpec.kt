@@ -2,9 +2,8 @@ package org.elteq.logic.users.spec
 
 import jakarta.ws.rs.QueryParam
 import lombok.Data
-import org.elteq.base.utils.PaginationDto
+import org.elteq.base.utils.queryUtils.PaginationDto
 import org.elteq.logic.users.enums.Status
-import java.time.LocalDateTime
 
 @Data
 class UserSpec : PaginationDto() {

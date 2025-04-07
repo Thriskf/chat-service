@@ -19,7 +19,7 @@ class AuthApiImpl(
 
     override fun login(dto: LoginDTO): UserLoginResponse {
         logger.info("User login request for ${dto.username}")
-        var data = UserDTO()
+        var data: UserDTO? = null
         var token: String? = null
 
         return runCatching {

@@ -7,7 +7,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class EmailDTO(
     @NotBlank
-    var recipient: String?,
+    var recipientEmail: String?,
+    var recipientName :String? = null,
     var subject: String,
     var body: String,
 )

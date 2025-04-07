@@ -1,15 +1,14 @@
 package org.elteq.base.utils.email
 
 
-import io.smallrye.mutiny.Uni
+import io.quarkus.mailer.Mail
+import io.quarkus.mailer.Mailer
+import io.quarkus.mailer.reactive.ReactiveMailer
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import jakarta.validation.Valid
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import io.quarkus.mailer.Mail
-import io.quarkus.mailer.Mailer
-import io.quarkus.mailer.reactive.ReactiveMailer
 
 
 @ApplicationScoped
@@ -27,22 +26,33 @@ class EmailService {
 
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
-    fun sendEmail(@Valid dto: EmailDTO) {
+    fun sendTextEmail(@Valid dto: EmailDTO) {
         mailer.send(
-            Mail.withText(dto.recipient, dto.subject, dto.body)
+            Mail.withText(dto.recipientEmail, dto.subject, dto.body)
+        )
+    }
+
+    fun sendHtmlEmail(@Valid dto: EmailDTO) {
+        val htmlContent = EmailTemplates.welcome(dto.recipientName!!).render()
+        mailer.send(
+            Mail.withHtml(
+                dto.recipientName,
+                "Welcome to Our App!",
+                htmlContent
+            )
         )
     }
 
 
-    fun sendEmailReactive(@Valid dto: EmailDTO): Uni<Void> {
-        return reactiveMailer.send(
-            Mail.withText(dto.recipient, dto.subject, dto.body)
-        ).onItem().invoke(() -> {
-            logger.info("Email sent successfully to ${dto.recipient}")
-        }).onFailure().invoke(failure -> {
-            logger.error("Failed to send email to ${dto.recipient}: ${failure.getMessage()}");
-        })
-    }
+//    fun sendEmailReactive(@Valid dto: EmailDTO): Uni<Void> {
+//        return reactiveMailer.send(
+//            Mail.withText(dto.recipient, dto.subject, dto.body)
+//        ).onItem().invoke(() -> {
+//            logger.info("Email sent successfully to ${dto.recipient}")
+//        }).onFailure().invoke(failure -> {
+//            logger.error("Failed to send email to ${dto.recipient}: ${failure.getMessage()}");
+//        })
+//    }
 
 }
 

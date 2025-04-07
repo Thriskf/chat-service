@@ -12,7 +12,6 @@ import org.elteq.logic.users.enums.Gender
 import org.elteq.logic.users.enums.Status
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
-import sun.security.util.Password
 import java.io.Serializable
 import java.time.LocalDateTime
 

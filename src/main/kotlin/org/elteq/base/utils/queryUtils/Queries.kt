@@ -1,4 +1,4 @@
-package org.elteq.base.utils
+package org.elteq.base.utils.queryUtils
 
 object Queries {
     fun contains(columnName: String, placeholder: String): String =

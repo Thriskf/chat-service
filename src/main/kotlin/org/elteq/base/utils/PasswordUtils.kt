@@ -1,6 +1,7 @@
 package org.elteq.base.utils
 
 import org.apache.commons.codec.digest.DigestUtils
+import org.mindrot.jbcrypt.BCrypt
 
 class PasswordUtils {
     companion object {
@@ -14,6 +15,10 @@ class PasswordUtils {
 
         fun hashPassword(password: String): String {
             return DigestUtils.sha512Hex(password)
+        }
+
+        private fun hashPasswordCrypt(password: String): String {
+            return BCrypt.hashpw(password, BCrypt.gensalt())
         }
 
         fun generateTemporaryPassword(length: Int): String {

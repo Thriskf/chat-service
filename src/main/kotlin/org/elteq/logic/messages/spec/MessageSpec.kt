@@ -1,9 +1,7 @@
 package org.elteq.logic.messages.spec
 
-import jakarta.ws.rs.QueryParam
 import lombok.Data
-import org.elteq.base.utils.PaginationDto
-import java.time.LocalDateTime
+import org.elteq.base.utils.queryUtils.PaginationDto
 
 
 @Data

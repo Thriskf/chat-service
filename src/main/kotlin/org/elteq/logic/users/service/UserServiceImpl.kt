@@ -12,16 +12,15 @@ import org.elteq.base.utils.MapperUtil.Mapper
 import org.elteq.base.utils.PasswordUtils
 import org.elteq.base.utils.email.EmailDTO
 import org.elteq.base.utils.email.EmailService
-import org.elteq.logic.chatRoom.dtos.ChatRoomDTO
-import org.elteq.logic.chatRoom.dtos.ChatRoomResponse
-import org.elteq.logic.contacts.models.Contact
 import org.elteq.logic.contacts.enums.ContactType
+import org.elteq.logic.contacts.models.Contact
 import org.elteq.logic.contacts.service.ContactService
 import org.elteq.logic.dob.servcice.DoBService
+import org.elteq.logic.users.dtos.*
+import org.elteq.logic.users.enums.Status
+import org.elteq.logic.users.models.Credentials
 import org.elteq.logic.users.models.UserRepository
 import org.elteq.logic.users.models.Users
-import org.elteq.logic.users.dtos.*
-import org.elteq.logic.users.models.Credentials
 import org.elteq.logic.users.spec.UserSpec
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -102,8 +101,8 @@ class UserServiceImpl(
         ent.contacts = contactSet
 
         runCatching {
-            val emailDto = EmailDTO(email.value, "Signup Successful", tmpPassword)
-            emailService.sendEmail(emailDto)
+            val emailDto = EmailDTO(email.value, ent.firstName, "Signup Successful", tmpPassword)
+            emailService.sendTextEmail(emailDto)
         }.fold(onSuccess = {
             logger.info("User signup email sent successfully ${email.value}")
         }, onFailure = {
@@ -278,14 +277,18 @@ class UserServiceImpl(
         var systemCode = ResponseMessage.SUCCESS.code
 
         logger.info("Reset User ${dto.email} password")
-
         var tmpPassword: String? = null
 
         val userResetResult = runCatching {
             val user = dto.email?.let { getByContact(it) }
 
             if (user == null) {
-                throw IllegalArgumentException("User not found")
+                return UserResponse(data).apply {
+                    this.code = ResponseMessage.FAIL.code
+                    this.systemCode = ResponseMessage.FAIL.code
+                    this.message = ResponseMessage.FAIL.message
+                    this.systemMessage = "User Not Found"
+                }
             }
 
             tmpPassword = passwordUtils.generateTemporaryPassword(10)
@@ -310,8 +313,8 @@ class UserServiceImpl(
 
         if (userResetResult.isSuccess && tmpPassword != null) {
             runCatching {
-                val emailDto = EmailDTO(dto.email, "Password Reset Successful", tmpPassword!!)
-                emailService.sendEmail(emailDto)
+                val emailDto = EmailDTO(dto.email, userResetResult.getOrNull()?.firstName, "Password Reset Successful", tmpPassword!!)
+                emailService.sendTextEmail(emailDto)
             }.fold(
                 onSuccess = {
                     logger.info("Password reset email sent to ${dto.email}")
@@ -336,20 +339,16 @@ class UserServiceImpl(
         logger.info("Updating user password for ${dto.userId}")
 
         val data = mutableListOf<UserDTO>()
-        var message = ResponseMessage.SUCCESS.message
-        var code = ResponseMessage.SUCCESS.code
-        var systemMessage = "Password Changed successfully"
-        var systemCode = ResponseMessage.SUCCESS.code
 
         val user = dto.userId?.let { getById(it) }
         val hashedOldP = dto.currentPassword?.let { passwordUtils.hashPassword(it) }
 
         if (hashedOldP != user?.password?.password) {
             return UserResponse(data).apply {
-                code = ResponseMessage.FAIL.code
-                systemCode = ResponseMessage.FAIL.code
-                message = ResponseMessage.FAIL.message
-                this.message = "Password mismatch"
+                this.code = ResponseMessage.FAIL.code
+                this.systemCode = ResponseMessage.FAIL.code
+                this.message = ResponseMessage.FAIL.message
+                this.systemMessage = "Password mismatch"
             }
         }
 
@@ -358,6 +357,7 @@ class UserServiceImpl(
         return runCatching {
             if (user?.firstLogin!!) {
                 user.firstLogin = false
+                user.status = Status.VERIFIED
             }
 
             user.password?.password = dto.newPassword?.let { passwordUtils.hashPassword(it) }
@@ -376,11 +376,12 @@ class UserServiceImpl(
                         ?.value.toString()
 
                     val emailDto = EmailDTO(
-                        recipient = email,
+                        recipientName = user?.firstName,
+                        recipientEmail = email,
                         subject = "Password Change Confirmation",
                         body = "Your password was successfully changed. If this wasn't you, please contact support immediately."
                     )
-                    emailService.sendEmail(emailDto)
+                    emailService.sendTextEmail(emailDto)
                 }.onSuccess {
                     logger.info("Password change confirmation email sent to $email")
                 }.onFailure {
@@ -389,18 +390,19 @@ class UserServiceImpl(
 
 
                 UserResponse(data).apply {
-                    this.code = code
-                    this.systemCode = systemCode
-                    this.message = message
+                    this.code = ResponseMessage.SUCCESS.code
+                    this.systemCode = ResponseMessage.SUCCESS.code
+                    this.message = ResponseMessage.SUCCESS.message
+                    this.systemMessage = "Password Changed successfully"
                 }
             },
             onFailure = {
                 logger.error("Unable to change password", it)
                 UserResponse(data).apply {
-                    code = ResponseMessage.FAIL.code
-                    systemCode = ResponseMessage.FAIL.code
-                    message = ResponseMessage.FAIL.message
-                    this.message = "Could not change password"
+                    this.code = ResponseMessage.FAIL.code
+                    this.systemCode = ResponseMessage.FAIL.code
+                    this.message = ResponseMessage.FAIL.message
+                    this.systemMessage = "Could not change password"
                 }
             }
         )
