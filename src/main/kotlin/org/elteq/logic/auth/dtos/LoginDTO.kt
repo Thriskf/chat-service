@@ -2,15 +2,16 @@ package org.elteq.logic.auth.dtos
 
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
-import kotlinx.serialization.Serializable
+import kotlinx.serialization.Required
 
-@Serializable
 data class LoginDTO(
     @NotBlank
     @Email
-    val username: String? = null,
+    @Required
+    var username: String? = null,
 
     @NotBlank
-    val password: String? = null,
+    @Required
+    var password: String? = null,
 
     )

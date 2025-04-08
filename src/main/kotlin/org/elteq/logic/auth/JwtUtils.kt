@@ -4,46 +4,60 @@ import io.smallrye.jwt.auth.principal.JWTParser
 import io.smallrye.jwt.build.Jwt
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
+import jakarta.persistence.EntityManager
+import lombok.extern.slf4j.Slf4j
 import org.eclipse.microprofile.config.inject.ConfigProperty
+import org.eclipse.microprofile.jwt.JsonWebToken
 import org.elteq.base.exception.AuthenticationException
 import org.elteq.logic.auth.dtos.TokenPair
 import org.elteq.logic.users.models.Users
 import org.elteq.logic.users.service.UserService
+import org.jboss.logging.Logger
 import java.time.Duration
 import java.time.Instant
 import java.util.*
+import java.util.concurrent.TimeUnit
 
+
+@Slf4j
 @ApplicationScoped
 class JwtUtils {
+
+    @Inject
+    private lateinit var logger: Logger
 
     @ConfigProperty(name = "token.issuer")
     private lateinit var issuer: String
 
-    @ConfigProperty(name = "token.expiration", defaultValue = "5")
-    private lateinit var tokenExpiration: String
+    @ConfigProperty(name = "token.accessToken.expiration", defaultValue = "5")
+    private lateinit var accessTokenExpiration: String
 
     @ConfigProperty(name = "token.refreshToken.expiration", defaultValue = "24")
     private lateinit var refreshTokenExpiration: String
 
     @Inject
-    lateinit var jwtParser: JWTParser
+    private lateinit var jwtParser: JWTParser
 
     @Inject
     private lateinit var userService: UserService
 
+    @Inject
+    private lateinit var entityManager: EntityManager
+
     fun generateTokenPair(user: Users): TokenPair {
-        val tokenExpiryDuration = Duration.ofHours(refreshTokenExpiration.toLong())
-        val tokenExpiryTime = Instant.now().plus(tokenExpiryDuration)
+        val accessTokenExpiryDuration = Duration.ofHours(accessTokenExpiration.toLong())
+        val accessTokenExpiryTime = Instant.now().plus(accessTokenExpiryDuration)
+        val accessSeconds = TimeUnit.HOURS.toSeconds(accessTokenExpiration.toLong())
 
-        val refreshTokenExpiryDuration = Duration.ofHours(tokenExpiration.toLong())
+        val refreshTokenExpiryDuration = Duration.ofHours(refreshTokenExpiration.toLong())
         val refreshTokenExpiryTime = Instant.now().plus(refreshTokenExpiryDuration)
+        val refreshSeconds = TimeUnit.HOURS.toSeconds(refreshTokenExpiration.toLong())
 
-        val accessToken = generateAccessToken(user, tokenExpiryTime)
+        val accessToken = generateAccessToken(user, accessTokenExpiryTime)
         val refreshToken = generateRefreshToken(user, refreshTokenExpiryTime)
 
-        return TokenPair(accessToken, refreshToken, tokenExpiryTime, refreshTokenExpiryTime)
+        return TokenPair(accessToken, refreshToken, accessTokenExpiryDuration.toSeconds(), refreshTokenExpiryDuration.toSeconds())
     }
-
 
     private fun generateAccessToken(user: Users, tokenExpiryTime: Instant): String {
         return Jwt.issuer(issuer)
@@ -53,6 +67,7 @@ class JwtUtils {
             .claim("firstName", user.firstName)
             .claim("lastName", user.lastName)
             .claim("gender", user.gender)
+            .claim("token_version", user.tokenVersion)
             .claim("token_type", "access")
             .expiresAt(tokenExpiryTime)
             .sign()
@@ -63,25 +78,41 @@ class JwtUtils {
             .upn(user.id)
             .subject(user.id)
             .claim("token_type", "refresh")
+            .claim("token_version", user.tokenVersion)
             .expiresAt(refreshTokenExpiryTime)
             .sign()
     }
 
-    fun validateRefreshToken(refreshToken: String): Boolean {
+    private fun parseToken(token: String): JsonWebToken {
         return try {
-            val jwt = jwtParser.parse(refreshToken)
-            jwt.getClaim<String>("token_type") == "refresh" &&
-                    jwt.expirationTime > Instant.now().epochSecond
+            jwtParser.parse(token)
+        } catch (e: Exception) {
+            throw AuthenticationException("Invalid refresh token")
+        }
+    }
+
+    private fun validateToken(token: String): Boolean {
+        return try {
+            val jwt = parseToken(token)
+            val userId = jwt.subject ?: return false
+            val user = userService.getById(userId) ?: return false
+
+            jwt.getClaim<Int>("token_version") == user.tokenVersion
         } catch (e: Exception) {
             false
         }
     }
 
-    fun refreshAccessToken(refreshToken: String): TokenPair {
-        val jwt = jwtParser.parse(refreshToken)
+    fun refreshAccessToken(refreshToken: String): String {
+
+        val jwt = parseToken(refreshToken)
 
         if (jwt.getClaim<String>("token_type") != "refresh") {
             throw AuthenticationException("Invalid token type")
+        }
+
+        if (!validateToken(refreshToken)) {
+            throw AuthenticationException("Invalid token")
         }
 
         if (jwt.expirationTime <= Instant.now().epochSecond) {
@@ -91,9 +122,27 @@ class JwtUtils {
         val userId = jwt.subject ?: throw AuthenticationException("Invalid token subject")
         val user = userService.getById(userId) ?: throw AuthenticationException("User not found")
 
-        return generateTokenPair(user)
+        val accessTokenExpiryDuration = Duration.ofHours(accessTokenExpiration.toLong())
+        val accessTokenExpiryTime = Instant.now().plus(accessTokenExpiryDuration)
+
+        return generateAccessToken(user, accessTokenExpiryTime)
     }
 
+    fun revokeAccessToken(token: String): Boolean {
+        return runCatching {
+            val jwt = parseToken(token)
+            val userId = jwt.subject ?: return false
+            val user = userService.getById(userId)
+            user.tokenVersion += 1
+            entityManager.merge(user)
+        }.fold(
+            onSuccess = { true },
+            onFailure = {
+                logger.error("Unable to revoke access token", it)
+                false
+            }
+        )
+    }
 
     fun generateToken(user: Users, email: String): String {
         val tokenExpiryDuration = Duration.ofHours(5)

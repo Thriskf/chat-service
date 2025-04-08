@@ -83,6 +83,9 @@ class Users : PanacheEntityBase(), Serializable {
     @Column(name = "first_login")
     var firstLogin = true
 
+    @Column(name = "token_version")
+    var tokenVersion: Int = 0
+
     @CreationTimestamp
     @Column(name = "created_on")
     var createdOn: LocalDateTime? = null

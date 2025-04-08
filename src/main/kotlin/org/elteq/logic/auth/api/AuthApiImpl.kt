@@ -1,15 +1,13 @@
 package org.elteq.logic.auth.api
 
 import jakarta.inject.Inject
+import jakarta.validation.Valid
 import org.elteq.base.apiResponse.domain.ApiResponse
-import org.elteq.logic.auth.dtos.LoginDTO
-import org.elteq.logic.auth.dtos.RefreshTokenRequest
-import org.elteq.logic.auth.dtos.UserChangePasswordDTO
-import org.elteq.logic.auth.dtos.UserForgetPasswordDTO
+import org.elteq.logic.auth.dtos.*
 import org.elteq.logic.auth.service.AuthService
-import org.elteq.logic.users.dtos.LoginResponse
 import org.elteq.logic.users.dtos.UserAddDTO
 import org.elteq.logic.users.dtos.UserDTO
+import org.elteq.logic.users.dtos.UserLoginResponse
 import org.elteq.logic.users.dtos.UserResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -24,7 +22,7 @@ class AuthApiImpl(
         return authService.register(dto)
     }
 
-    override fun login(dto: LoginDTO): LoginResponse {
+    override fun login(@Valid dto: LoginDTO): UserLoginResponse {
         logger.info("User login request for ${dto.username}")
         return authService.login(dto)
     }
@@ -39,12 +37,12 @@ class AuthApiImpl(
         return authService.updatePassword(dto)
     }
 
-    override fun logout() {
+    override fun logout(token: String): LogOutResponse {
         logger.info("Logout request received")
-        return authService.logout()
+        return authService.logout(token)
     }
 
-    override fun refreshToken(dto: RefreshTokenRequest): ApiResponse<UserDTO> {
+    override fun refreshToken(dto: RefreshTokenRequest): RefreshResponse {
         logger.info("refresh token request received")
         return authService.refreshToken(dto)
     }

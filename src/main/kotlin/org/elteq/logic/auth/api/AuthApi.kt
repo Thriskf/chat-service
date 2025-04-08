@@ -8,13 +8,10 @@ import jakarta.ws.rs.core.MediaType
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.elteq.base.apiResponse.domain.ApiResponse
-import org.elteq.logic.auth.dtos.LoginDTO
-import org.elteq.logic.auth.dtos.RefreshTokenRequest
-import org.elteq.logic.auth.dtos.UserChangePasswordDTO
-import org.elteq.logic.auth.dtos.UserForgetPasswordDTO
-import org.elteq.logic.users.dtos.LoginResponse
+import org.elteq.logic.auth.dtos.*
 import org.elteq.logic.users.dtos.UserAddDTO
 import org.elteq.logic.users.dtos.UserDTO
+import org.elteq.logic.users.dtos.UserLoginResponse
 import org.elteq.logic.users.dtos.UserResponse
 
 @Authenticated
@@ -34,7 +31,7 @@ interface AuthApi {
     @POST
     @Path("/login")
     @PermitAll
-    fun login(@Valid dto: LoginDTO): LoginResponse
+    fun login(@Valid dto: LoginDTO): UserLoginResponse
 
     @PATCH
     @Path("/reset-password")
@@ -47,9 +44,11 @@ interface AuthApi {
 
     @POST
     @Path("logout")
-    fun logout()
+    fun logout(
+        @HeaderParam("Authorization") token: String,
+    ): LogOutResponse
 
     @POST
     @Path("/refresh-token")
-    fun refreshToken(@Valid dto:RefreshTokenRequest): ApiResponse<UserDTO>
+    fun refreshToken(@Valid dto: RefreshTokenRequest): RefreshResponse
 }

@@ -2,6 +2,7 @@ package org.elteq.logic.auth.service
 
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
+import jakarta.transaction.Transactional
 import org.elteq.base.apiResponse.domain.ApiResponse
 import org.elteq.base.apiResponse.domain.ResponseMessage
 import org.elteq.base.apiResponse.wrapFailureInResponse
@@ -9,10 +10,7 @@ import org.elteq.base.apiResponse.wrapInSuccessResponse
 import org.elteq.base.utils.MapperUtil.Mapper
 import org.elteq.logic.auth.JwtUtils
 import org.elteq.logic.auth.dtos.*
-import org.elteq.logic.users.dtos.LoginResponse
-import org.elteq.logic.users.dtos.UserAddDTO
-import org.elteq.logic.users.dtos.UserDTO
-import org.elteq.logic.users.dtos.UserResponse
+import org.elteq.logic.users.dtos.*
 import org.elteq.logic.users.service.UserService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -31,8 +29,8 @@ class AuthServiceImp(
             val ent = userService.add(dto)
             modelMapper.map(ent, UserDTO::class.java)
         }.fold(
-            onSuccess = { dto ->
-                val response = wrapInSuccessResponse(dto)
+            onSuccess = {
+                val response = wrapInSuccessResponse(it)
                 logger.info("Added new user response message: ${response.message}")
                 response
             },
@@ -43,14 +41,16 @@ class AuthServiceImp(
         )
     }
 
-    override fun login(dto: LoginDTO): LoginResponse {
+    override fun login(dto: LoginDTO): UserLoginResponse {
         var tokenPair: TokenPair? = null
+        val loginResponse = LoginResponse(UserDTO())
+
 
         return runCatching {
             val user = userService.getByContact(dto.username!!)
             val verified = userService.verifyPassword(dto.password!!, user.password?.password!!)
             if (!verified) {
-                return LoginResponse(UserDTO()).apply {
+                return UserLoginResponse(loginResponse).apply {
                     this.code = ResponseMessage.FAIL.code
                     this.systemCode = ResponseMessage.FAIL.code
                     this.message = ResponseMessage.FAIL.message
@@ -62,21 +62,24 @@ class AuthServiceImp(
             modelMapper.map(user, UserDTO::class.java)
         }.fold(onSuccess = {
             logger.info("User login success for ${dto.username}")
-            LoginResponse(it).apply {
-                this.code = ResponseMessage.SUCCESS.code
-                this.systemMessage = "Login Successful"
-                this.message = ResponseMessage.SUCCESS.message
-                this.systemCode = ResponseMessage.SUCCESS.code
+
+            val lResponse = LoginResponse(it).apply {
                 this.accessToken = tokenPair?.accessToken
                 this.refreshToken = tokenPair?.refreshToken
                 this.refreshTokenExpiresIn = tokenPair?.refreshTokenExpiry
                 this.accessTokenExpiresIn = tokenPair?.accessTokenExpiry
+            }
 
+            UserLoginResponse(lResponse).apply {
+                this.code = ResponseMessage.SUCCESS.code
+                this.systemMessage = "Login Successful"
+                this.message = ResponseMessage.SUCCESS.message
+                this.systemCode = ResponseMessage.SUCCESS.code
 
             }
         }, onFailure = {
             logger.error("Login failure! Error :: ", it)
-            LoginResponse(UserDTO()).apply {
+            UserLoginResponse(loginResponse).apply {
                 this.code = ResponseMessage.FAIL.code
                 this.systemMessage = "Login Failed"
                 this.message = ResponseMessage.FAIL.message
@@ -93,12 +96,16 @@ class AuthServiceImp(
         return userService.updatePassword(dto)
     }
 
-    override fun logout() {
-        TODO("Not yet implemented")
+    @Transactional
+    override fun logout(token: String): LogOutResponse {
+        val logOut = jwtUtils.revokeAccessToken(token)
+        return LogOutResponse(logOut)
     }
 
-    override fun refreshToken(dto: RefreshTokenRequest): ApiResponse<UserDTO> {
-        TODO("Not yet implemented")
+    override fun refreshToken(dto: RefreshTokenRequest): RefreshResponse {
+        val token = jwtUtils.refreshAccessToken(dto.refreshToken!!)
+        return RefreshResponse(token)
+
     }
 
 }
