@@ -12,6 +12,8 @@ import org.elteq.base.utils.MapperUtil.Mapper
 import org.elteq.base.utils.PasswordUtils
 import org.elteq.base.utils.email.EmailDTO
 import org.elteq.base.utils.email.EmailService
+import org.elteq.logic.auth.dtos.UserChangePasswordDTO
+import org.elteq.logic.auth.dtos.UserForgetPasswordDTO
 import org.elteq.logic.contacts.enums.ContactType
 import org.elteq.logic.contacts.models.Contact
 import org.elteq.logic.contacts.service.ContactService
@@ -317,7 +319,8 @@ class UserServiceImpl(
                 emailService.sendTextEmail(emailDto)
             }.fold(
                 onSuccess = {
-                    logger.info("Password reset email sent to ${dto.email}")
+                    logger
+                        .info("Password reset email sent to ${dto.email}")
                 },
                 onFailure = {
                     logger.error("Failed to send password reset email to ${dto.email}", it)

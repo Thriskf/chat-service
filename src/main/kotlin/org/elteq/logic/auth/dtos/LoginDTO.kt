@@ -1,13 +1,16 @@
-package org.elteq.logic.users.dtos
+package org.elteq.logic.auth.dtos
 
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import kotlinx.serialization.Serializable
-import org.elteq.logic.users.enums.Status
 
 @Serializable
-data class UserForgetPasswordDTO(
+data class LoginDTO(
     @NotBlank
     @Email
-    var email: String? = null,
-)
+    val username: String? = null,
+
+    @NotBlank
+    val password: String? = null,
+
+    )

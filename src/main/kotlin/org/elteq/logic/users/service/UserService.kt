@@ -2,6 +2,8 @@ package org.elteq.logic.users.service
 
 
 import io.quarkus.hibernate.orm.panache.PanacheQuery
+import org.elteq.logic.auth.dtos.UserChangePasswordDTO
+import org.elteq.logic.auth.dtos.UserForgetPasswordDTO
 import org.elteq.logic.users.dtos.*
 import org.elteq.logic.users.models.Users
 import org.elteq.logic.users.spec.UserSpec

@@ -2,98 +2,50 @@ package org.elteq.logic.auth.api
 
 import jakarta.inject.Inject
 import org.elteq.base.apiResponse.domain.ApiResponse
-import org.elteq.base.apiResponse.domain.ResponseMessage
-import org.elteq.base.apiResponse.wrapFailureInResponse
-import org.elteq.base.apiResponse.wrapInSuccessResponse
-import org.elteq.base.utils.MapperUtil.Mapper
-import org.elteq.base.utils.PasswordUtils
-import org.elteq.logic.auth.JwtUtils
-import org.elteq.logic.users.dtos.*
-import org.elteq.logic.users.service.UserService
+import org.elteq.logic.auth.dtos.LoginDTO
+import org.elteq.logic.auth.dtos.RefreshTokenRequest
+import org.elteq.logic.auth.dtos.UserChangePasswordDTO
+import org.elteq.logic.auth.dtos.UserForgetPasswordDTO
+import org.elteq.logic.auth.service.AuthService
+import org.elteq.logic.users.dtos.LoginResponse
+import org.elteq.logic.users.dtos.UserAddDTO
+import org.elteq.logic.users.dtos.UserDTO
+import org.elteq.logic.users.dtos.UserResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class AuthApiImpl(
-    @Inject var userService: UserService,
-    @Inject var jwtUtils: JwtUtils,
+    @Inject var authService: AuthService,
 ) : AuthApi {
 
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
-    private val modelMapper = Mapper.mapper
-    private val passwordUtils = PasswordUtils
-
-
     override fun register(dto: UserAddDTO): ApiResponse<UserDTO> {
         logger.info("Adding new user: $dto")
-
-        return runCatching {
-            val ent = userService.add(dto)
-            modelMapper.map(ent, UserDTO::class.java)
-        }.fold(
-            onSuccess = { dto ->
-                val response = wrapInSuccessResponse(dto)
-                logger.info("Added new user response message: ${response.message}")
-                response
-            },
-            onFailure = { e ->
-                logger.error("Failed to add new user", e)
-                wrapFailureInResponse("Could not add new user. ${e.message}")
-            }
-        )
+        return authService.register(dto)
     }
 
-
-    override fun login(dto: LoginDTO): UserLoginResponse {
+    override fun login(dto: LoginDTO): LoginResponse {
         logger.info("User login request for ${dto.username}")
-        var data: UserDTO? = null
-        var token: String? = null
-
-        return runCatching {
-            val user = userService.getByContact(dto.username!!)
-            val verified = userService.verifyPassword(dto.password!!, user.password?.password!!)
-            if (!verified) {
-                return UserLoginResponse(data).apply {
-                    this.code = ResponseMessage.FAIL.code
-                    this.systemCode = ResponseMessage.FAIL.code
-                    this.message = ResponseMessage.FAIL.message
-                    this.systemMessage = "Invalid Credential!"
-                }
-            }
-
-            token = jwtUtils.generateToken(user, dto.username!!)
-            modelMapper.map(user, UserDTO::class.java)
-        }.fold(onSuccess = {
-            data = it
-            logger.info("User login success for ${dto.username}")
-            UserLoginResponse(data).apply {
-                this.code = ResponseMessage.SUCCESS.code
-                this.systemMessage = "Login Successful"
-                this.message = ResponseMessage.SUCCESS.message
-                this.systemCode = ResponseMessage.SUCCESS.code
-                this.accessToken = token
-            }
-        }, onFailure = {
-            logger.error("Login failure! Error :: ", it)
-            UserLoginResponse(data).apply {
-                this.code = ResponseMessage.FAIL.code
-                this.systemMessage = "Login Failed"
-                this.message = ResponseMessage.FAIL.message
-                this.systemCode = ResponseMessage.FAIL.code
-            }
-        })
+        return authService.login(dto)
     }
 
     override fun resetPassword(dto: UserForgetPasswordDTO): UserResponse {
         logger.info("reset password request for ${dto.email}")
-        return userService.resetPassword(dto)
+        return authService.resetPassword(dto)
     }
 
     override fun updatePassword(dto: UserChangePasswordDTO): UserResponse {
         logger.info("update password request for ${dto.userId}")
-        return userService.updatePassword(dto)
+        return authService.updatePassword(dto)
     }
 
     override fun logout() {
-        TODO("Not yet implemented")
+        logger.info("Logout request received")
+        return authService.logout()
+    }
+
+    override fun refreshToken(dto: RefreshTokenRequest): ApiResponse<UserDTO> {
+        logger.info("refresh token request received")
+        return authService.refreshToken(dto)
     }
 }
