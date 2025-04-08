@@ -1,8 +1,12 @@
 package org.elteq.logic.auth.api
 
 import jakarta.inject.Inject
+import org.elteq.base.apiResponse.domain.ApiResponse
 import org.elteq.base.apiResponse.domain.ResponseMessage
+import org.elteq.base.apiResponse.wrapFailureInResponse
+import org.elteq.base.apiResponse.wrapInSuccessResponse
 import org.elteq.base.utils.MapperUtil.Mapper
+import org.elteq.base.utils.PasswordUtils
 import org.elteq.logic.auth.JwtUtils
 import org.elteq.logic.users.dtos.*
 import org.elteq.logic.users.service.UserService
@@ -16,6 +20,28 @@ class AuthApiImpl(
 
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
     private val modelMapper = Mapper.mapper
+    private val passwordUtils = PasswordUtils
+
+
+    override fun register(dto: UserAddDTO): ApiResponse<UserDTO> {
+        logger.info("Adding new user: $dto")
+
+        return runCatching {
+            val ent = userService.add(dto)
+            modelMapper.map(ent, UserDTO::class.java)
+        }.fold(
+            onSuccess = { dto ->
+                val response = wrapInSuccessResponse(dto)
+                logger.info("Added new user response message: ${response.message}")
+                response
+            },
+            onFailure = { e ->
+                logger.error("Failed to add new user", e)
+                wrapFailureInResponse("Could not add new user. ${e.message}")
+            }
+        )
+    }
+
 
     override fun login(dto: LoginDTO): UserLoginResponse {
         logger.info("User login request for ${dto.username}")
@@ -24,6 +50,16 @@ class AuthApiImpl(
 
         return runCatching {
             val user = userService.getByContact(dto.username!!)
+            val verified = userService.verifyPassword(dto.password!!, user.password?.password!!)
+            if (!verified) {
+                return UserLoginResponse(data).apply {
+                    this.code = ResponseMessage.FAIL.code
+                    this.systemCode = ResponseMessage.FAIL.code
+                    this.message = ResponseMessage.FAIL.message
+                    this.systemMessage = "Invalid Credential!"
+                }
+            }
+
             token = jwtUtils.generateToken(user, dto.username!!)
             modelMapper.map(user, UserDTO::class.java)
         }.fold(onSuccess = {
@@ -34,7 +70,7 @@ class AuthApiImpl(
                 this.systemMessage = "Login Successful"
                 this.message = ResponseMessage.SUCCESS.message
                 this.systemCode = ResponseMessage.SUCCESS.code
-                this.token = token
+                this.accessToken = token
             }
         }, onFailure = {
             logger.error("Login failure! Error :: ", it)

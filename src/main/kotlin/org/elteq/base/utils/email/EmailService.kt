@@ -27,20 +27,40 @@ class EmailService {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     fun sendTextEmail(@Valid dto: EmailDTO) {
-        mailer.send(
-            Mail.withText(dto.recipientEmail, dto.subject, dto.body)
+        logger.info("about to send text email")
+        runCatching {
+            mailer.send(
+                Mail.withText(dto.recipientEmail, dto.subject, dto.body)
+            )
+        }.fold(
+            onSuccess = {
+                logger.info("Text email sent successfully ${dto.recipientEmail}")
+            },
+            onFailure = {
+                logger.error("Error while sending text email ${dto.recipientEmail}", it)
+            }
         )
+
     }
 
     fun sendHtmlEmail(@Valid dto: EmailDTO) {
-        val htmlContent = EmailTemplates.welcome(dto.recipientName!!).render()
-        mailer.send(
-            Mail.withHtml(
-                dto.recipientName,
-                "Welcome to Our App!",
-                htmlContent
+        logger.info("about to send html email")
+        val htmlContent = EmailTemplates.welcome(dto.recipientEmail!!).render()
+        runCatching {
+            mailer.send(
+                Mail.withHtml(
+                    dto.recipientName,
+                    "Welcome to Our App!",
+                    htmlContent
+                )
             )
-        )
+        }.fold(
+            onSuccess = {
+                logger.info("Html email sent successfully ${dto.recipientEmail}")
+            }, onFailure = {
+                logger.error("Error while sending html email ${dto.recipientEmail}", it)
+            })
+
     }
 
 

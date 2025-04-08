@@ -19,10 +19,10 @@ class JwtUtils {
         val expiryTime = Instant.now().plus(tokenExpiryDuration)
 
         return Jwt.issuer(issuer) // Set the issuer
-            .upn(email) // Set the "upn" (User Principal Name) claim
-            .subject(email) // Set the subject (username)
+            .upn(user.id) // Set the "upn" (User Principal Name) claim
+            .subject(user.id) // Set the subject (username)
 //            .groups(roles) // Add roles as groups
-            .claim("email", email) // Add custom claim for email
+//            .claim("email", email) // Add custom claim for email
             .claim("displayName", user.displayName)
             .claim("firstName", user.firstName)
             .claim("lastName", user.lastName)

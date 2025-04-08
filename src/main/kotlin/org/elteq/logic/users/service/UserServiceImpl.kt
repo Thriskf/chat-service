@@ -87,6 +87,8 @@ class UserServiceImpl(
         email.value = dto.email!!
         email.user = ent
         contactSet.add(email)
+        ent.contacts = contactSet
+
 
         val tmpPassword = passwordUtils.generateTemporaryPassword(10)
         val passwordCredential = Credentials().apply {
@@ -98,7 +100,7 @@ class UserServiceImpl(
         ent.password = passwordCredential
 
         logger.info("user contact $contactSet")
-        ent.contacts = contactSet
+        repo.persist(ent)
 
         runCatching {
             val emailDto = EmailDTO(email.value, ent.firstName, "Signup Successful", tmpPassword)
@@ -108,8 +110,6 @@ class UserServiceImpl(
         }, onFailure = {
             logger.error("error occurred while sending signup email", it)
         })
-
-        repo.persist(ent)
         logger.info("User added: $ent")
         return ent
 
@@ -328,8 +328,8 @@ class UserServiceImpl(
         val response = UserResponse(data)
         response.code = code
         response.systemCode = systemCode
-        response.message = systemMessage
         response.message = message
+        response.systemMessage = systemMessage
         return response
 
     }
@@ -341,9 +341,10 @@ class UserServiceImpl(
         val data = mutableListOf<UserDTO>()
 
         val user = dto.userId?.let { getById(it) }
-        val hashedOldP = dto.currentPassword?.let { passwordUtils.hashPassword(it) }
 
-        if (hashedOldP != user?.password?.password) {
+        val verified = verifyPassword(dto.currentPassword!!, user?.password?.password!!)
+
+        if (!verified) {
             return UserResponse(data).apply {
                 this.code = ResponseMessage.FAIL.code
                 this.systemCode = ResponseMessage.FAIL.code
@@ -409,4 +410,16 @@ class UserServiceImpl(
 
     }
 
+    override fun verifyPassword(password: String, hashedPassword: String): Boolean {
+        return runCatching {
+            passwordUtils.hashPassword(password)
+        }.fold(
+            onSuccess = {
+                it == hashedPassword
+            }, onFailure = {
+                logger.warn("Could not verify password", it)
+                false
+            }
+        )
+    }
 }

@@ -1,14 +1,16 @@
 package org.elteq.logic.users.api
 
 import io.quarkus.security.Authenticated
-import jakarta.validation.Valid
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.elteq.base.apiResponse.domain.ApiResponse
-import org.elteq.logic.users.dtos.*
+import org.elteq.logic.users.dtos.UserDTO
+import org.elteq.logic.users.dtos.UserUpdateContactDTO
+import org.elteq.logic.users.dtos.UserUpdateNameDTO
+import org.elteq.logic.users.dtos.UserUpdateStatusDTO
 import org.elteq.logic.users.spec.UserSpec
 
 @Path("/api/v1/user")
@@ -18,9 +20,6 @@ import org.elteq.logic.users.spec.UserSpec
 @Authenticated
 @Tag(name = "Users", description = "Users")
 interface UserApi {
-
-    @POST
-    fun add(@Valid dto: UserAddDTO): ApiResponse<UserDTO>
 
     @GET
     @Path("/{id}")
