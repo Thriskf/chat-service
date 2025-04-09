@@ -82,10 +82,15 @@ class CustomJWTCallerPrincipalFactory(
 
         //validate token version
         val userId = claims.subject ?: throw ParseException("Subject is null")
+//         val user = runBlocking(Dispatchers.IO) {
+//             userService.getById(userId)
+//         }
+
         val user = userService.getById(userId)
+
         val version = claims.getClaimValue("token_version") ?: throw ParseException("Null token version")
 
-        if (version as Int == user.tokenVersion) {
+        if (version as Int != user.tokenVersion) {
             throw ParseException("Invalid token version")
         }
     }
