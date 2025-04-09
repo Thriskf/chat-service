@@ -4,7 +4,6 @@ import io.smallrye.jwt.auth.principal.JWTParser
 import io.smallrye.jwt.build.Jwt
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
-import jakarta.persistence.EntityManager
 import lombok.extern.slf4j.Slf4j
 import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.eclipse.microprofile.jwt.JsonWebToken
@@ -40,9 +39,6 @@ class JwtUtils {
 
     @Inject
     private lateinit var userService: UserService
-
-    @Inject
-    private lateinit var entityManager: EntityManager
 
     fun generateTokenPair(user: Users): TokenPair {
         val accessTokenExpiryDuration = Duration.ofHours(accessTokenExpiration.toLong())
@@ -134,7 +130,6 @@ class JwtUtils {
             val userId = jwt.subject ?: return false
             val user = userService.getById(userId)
             user.tokenVersion += 1
-            entityManager.merge(user)
         }.fold(
             onSuccess = { true },
             onFailure = {
