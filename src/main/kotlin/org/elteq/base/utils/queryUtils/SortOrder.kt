@@ -1,6 +1,6 @@
 package org.elteq.base.utils.queryUtils
 
-enum class SortOrder {
-    DESC,
-    ASC
+enum class SortOrder(code:String) {
+    DESC("DESC"),
+    ASC("ASC")
 }

@@ -84,7 +84,7 @@ class Users : PanacheEntityBase(), Serializable {
     var firstLogin = true
 
     @Column(name = "token_version")
-    var tokenVersion: Int = 0
+    var tokenVersion: Long = 0
 
     @CreationTimestamp
     @Column(name = "created_on")

@@ -88,15 +88,18 @@ class JwtUtils {
     }
 
     private fun validateToken(token: String): Boolean {
-        return try {
+        return runCatching {
             val jwt = parseToken(token)
             val userId = jwt.subject ?: return false
-            val user = userService.getById(userId) ?: return false
-
-            jwt.getClaim<Int>("token_version") == user.tokenVersion
-        } catch (e: Exception) {
-            false
-        }
+            val user = userService.getById(userId)
+            jwt.getClaim<Long>("token_version") == user.tokenVersion
+        }.fold(
+            onSuccess = {
+                true
+            }, onFailure = {
+                false
+            }
+        )
     }
 
     fun refreshAccessToken(refreshToken: String): String {

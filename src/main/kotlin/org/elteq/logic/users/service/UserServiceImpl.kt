@@ -117,6 +117,7 @@ class UserServiceImpl(
 
     }
 
+    @Transactional
     override fun getById(id: String): Users {
         return repo.findById(id) ?: throw ServiceException(-2, "User with id $id was not found")
     }

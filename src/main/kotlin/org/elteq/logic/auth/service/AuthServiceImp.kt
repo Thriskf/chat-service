@@ -98,8 +98,21 @@ class AuthServiceImp(
 
     @Transactional
     override fun logout(token: String): LogOutResponse {
-        val logOut = jwtUtils.revokeAccessToken(token)
-        return LogOutResponse(logOut)
+        return runCatching {
+            jwtUtils.revokeAccessToken(token)
+        }.fold(
+            onSuccess = {
+                LogOutResponse("Success").apply {
+                    this.status = it
+                }
+            },
+            onFailure = {
+                logger.error("Log out failed", it)
+                LogOutResponse("Failed").apply {
+                    this.status = false
+                }
+            }
+        )
     }
 
     override fun refreshToken(dto: RefreshTokenRequest): RefreshResponse {

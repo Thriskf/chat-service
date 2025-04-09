@@ -26,7 +26,7 @@ abstract class PaginationDto {
     open var sortBy: String = "createdOn"
 
     @QueryParam("sortOrder")
-    @DefaultValue("DESCENDING")
+    @DefaultValue("DESC")
     open var sortOrder: SortOrder = SortOrder.DESC
 
     @QueryParam("from")
