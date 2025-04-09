@@ -3,13 +3,16 @@
 base=project
 name=chat-service
 version=latest
-image=$base/$name:$version
+image=$base-$name-$version
+repo=nelieli/elteq
+to_push=$repo:$image
+
 docker rmi $image -f
-#docker rmi registry.generisdevelopers.com/hospital-management-system/patient-service:$version
+docker rmi $to_push -f
 
 DOCKER_BUILDKIT=1 docker buildx build --platform linux/amd64 -f docker/Dockerfile -t $image .
-#docker image tag hospital-management-system/$image registry.generisdevelopers.com/hospital-management-system/$image
+docker image tag $image $to_push
 
-#docker login registry.generisdevelopers.com -u dev_push -p 5wsxcde3GH
-#docker image push registry.generisdevelopers.com/hospital-management-system/patient-service:$version
-#docker logout registry.generisdevelopers.com
+docker login -u nelieli -p dckr_pat_G08s1YNsq0YyEAg_wBdumKF7txY
+docker image push $to_push
+docker logout nelieli

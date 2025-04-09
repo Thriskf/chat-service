@@ -1,70 +1,84 @@
 # syntax=docker/dockerfile:1
 
-# Optimized Dockerfile with improved comments and structure.
-# For reference on Dockerfile commands, visit https://docs.docker.com/go/dockerfile-reference/
-
+################################################################################
+# Multi-stage Dockerfile for building and running a Quarkus Java application
+#
+# Stage 1: Dependency resolution
+# Stage 2: Application build
+# Stage 3: Lean runtime environment
+#
+# For reference: https://docs.docker.com/go/dockerfile-reference/
 ################################################################################
 
-# Stage 1: Dependency Resolution and Download
-FROM eclipse-temurin:21-jdk-jammy as deps
+# ------------------------------------------------------------------------------
+# Stage 1: Dependency Resolution - Download all dependencies first for caching
+# ------------------------------------------------------------------------------
+FROM eclipse-temurin:21-jdk-jammy AS deps
 
+# Set working directory
 WORKDIR /build
 
-# Copy Maven Wrapper and configuration files
-COPY --chmod=0755 mvnw mvnw
-COPY .mvn/ .mvn/
-COPY pom.xml pom.xml
+# Copy build configuration files
+COPY --chmod=0755 mvnw .
+COPY .mvn .mvn
+COPY pom.xml .
 
-# Download dependencies leveraging Docker's caching capabilities.
+# Download dependencies (cached in /root/.m2)
 RUN --mount=type=cache,target=/root/.m2 \
     ./mvnw dependency:go-offline -DskipTests
 
-################################################################################
+# ------------------------------------------------------------------------------
+# Stage 2: Application Build - Compile code and build JAR
+# ------------------------------------------------------------------------------
+FROM deps AS build
 
-# Stage 2: Build Application
-FROM deps as build
-
-WORKDIR /build
-
-# Copy the application source code, configuration, and application properties
-COPY src ./src
-COPY pom.xml ./pom.xml
+# Copy application source code
+COPY src src
 COPY src/main/resources/prod-application.properties src/main/resources/application.properties
 
-# Build the application JAR
+# Set build arguments with default values
 ARG ARTIFACT_ID=chat-service
 ARG VERSION=1.0.0-SNAPSHOT
-ARG JARNAME=${ARTIFACT_ID}-${VERSION}-runner.jar
+ARG JAR_NAME=${ARTIFACT_ID}-${VERSION}-runner.jar
+
+# Build application and rename JAR for simplicity
 RUN --mount=type=cache,target=/root/.m2 \
     ./mvnw clean package -DskipTests -Dquarkus.package.type=uber-jar && \
-    cp target/${JARNAME} target/app.jar
+    mv target/${JAR_NAME} target/app.jar
 
-################################################################################
+# ------------------------------------------------------------------------------
+# Stage 3: Runtime - Create minimal production image
+# ------------------------------------------------------------------------------
+FROM eclipse-temurin:21-jre-jammy AS runtime
 
-# Stage 3: Runtime Environment
-FROM eclipse-temurin:21-jre-jammy AS final
+# Application metadata
+LABEL maintainer="Your Name <your.email@example.com>"
+LABEL description="Chat Service Application"
 
-# Create a non-privileged user to run the application
-ARG UID=10001
+# Security: Run as non-root user
+ARG APP_UID=10001
 RUN adduser \
     --disabled-password \
     --gecos "" \
     --home "/nonexistent" \
     --shell "/sbin/nologin" \
     --no-create-home \
-    --uid "${UID}" \
+    --uid "${APP_UID}" \
     appuser
+
+# Copy the built JAR from previous stage
+COPY --from=build --chown=appuser /build/target/app.jar /app/app.jar
+WORKDIR /app
+
+# Switch to non-root user
 USER appuser
 
-# Copy the executable JAR from the build stage
-COPY --from=build /build/target/app.jar app.jar
-
-# Expose the application port
+# Expose application port
 EXPOSE 8050
 
-# Define a health check for the container
+# Health check configuration
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s \
     CMD curl -f http://localhost:8050/health || exit 1
 
-# Command to run the application
+# Runtime command (use exec form for better signal handling)
 ENTRYPOINT ["java", "-jar", "app.jar"]
