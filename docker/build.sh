@@ -2,7 +2,7 @@
 
 #CREDENTIALS
 userName=nelieli
-password=dckr_pat_G08s1YNsq0YyEAg_wBdumKF7txY
+#password=dckr_pat_G08s1YNsq0YyEAg_wBdumKF7txY
 repo=$userName/elteq
 
 #IMAGE TAGS
