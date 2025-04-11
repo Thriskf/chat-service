@@ -52,7 +52,7 @@ RUN --mount=type=cache,target=/root/.m2 \
 FROM eclipse-temurin:21-jre-jammy AS runtime
 
 # Application metadata
-LABEL maintainer="Your Name <your.email@example.com>"
+LABEL maintainer="thrisk.f@gmail.com"
 LABEL description="Chat Service Application"
 
 # Security: Run as non-root user

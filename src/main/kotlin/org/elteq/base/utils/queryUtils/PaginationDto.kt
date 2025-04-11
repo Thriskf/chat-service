@@ -33,7 +33,8 @@ abstract class PaginationDto {
     var from: LocalDateTime? = null
 
     @QueryParam("deleted")
-    var deleted: Boolean? = false
+    @DefaultValue("false")
+    var deleted: Boolean = false
 
     @QueryParam("to")
     var to: LocalDateTime? = null
