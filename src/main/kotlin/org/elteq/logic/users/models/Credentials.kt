@@ -4,7 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase
 import jakarta.json.bind.annotation.JsonbTransient
 import jakarta.persistence.*
+import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.UpdateTimestamp
 import java.io.Serializable
+import java.time.LocalDateTime
 
 @Entity
 @Table(
@@ -22,11 +25,22 @@ class Credentials : PanacheEntityBase(), Serializable {
 
     @JsonIgnore
     @JsonbTransient
-    @OneToOne(cascade = [CascadeType.ALL], fetch = FetchType.LAZY,)
+    @OneToOne(cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     var user: Users? = null
 
     @Column(name = "password", nullable = false)
     var password: String? = null
+
+    @Column(name = "expires_in", nullable = false)
+    var expiresIn: LocalDateTime? = null
+
+    @CreationTimestamp
+    @Column(name = "created_on")
+    var createdOn: LocalDateTime? = null
+
+    @UpdateTimestamp
+    @Column(name = "updated_on")
+    var updatedOn: LocalDateTime? = null
 
 }

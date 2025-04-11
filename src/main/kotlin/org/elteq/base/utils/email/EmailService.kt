@@ -7,6 +7,7 @@ import io.quarkus.mailer.reactive.ReactiveMailer
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import jakarta.validation.Valid
+import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -24,20 +25,25 @@ class EmailService {
     @Inject
     private lateinit var reactiveMailer: ReactiveMailer
 
+    @ConfigProperty(name = "quarkus.mailer.username")
+    private lateinit var username: String
+
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     fun sendTextEmail(@Valid dto: EmailDTO) {
         logger.info("about to send text email")
         runCatching {
+            val mail = Mail.withText(dto.recipientEmail, dto.subject, dto.body)
+//                .setFrom(username)
             mailer.send(
-                Mail.withText(dto.recipientEmail, dto.subject, dto.body)
+                mail
             )
         }.fold(
             onSuccess = {
-                logger.info("Text email sent successfully ${dto.recipientEmail}")
+                logger.info("Text email sent successfully to :: ${dto.recipientEmail}")
             },
             onFailure = {
-                logger.error("Error while sending text email ${dto.recipientEmail}", it)
+                logger.error("Error while sending text email to :: ${dto.recipientEmail}", it)
             }
         )
 
@@ -56,9 +62,9 @@ class EmailService {
             )
         }.fold(
             onSuccess = {
-                logger.info("Html email sent successfully ${dto.recipientEmail}")
+                logger.info("Html email sent successfully to :: ${dto.recipientEmail}")
             }, onFailure = {
-                logger.error("Error while sending html email ${dto.recipientEmail}", it)
+                logger.error("Error while sending html email to :: ${dto.recipientEmail}", it)
             })
 
     }

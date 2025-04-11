@@ -5,6 +5,7 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.inject.Default
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
+import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.elteq.base.apiResponse.domain.ResponseMessage
 import org.elteq.base.exception.ServiceException
 import org.elteq.base.utils.ExportUtil
@@ -26,6 +27,7 @@ import org.elteq.logic.users.models.Users
 import org.elteq.logic.users.spec.UserSpec
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.time.LocalDateTime
 import java.util.stream.Collectors
 
 @ApplicationScoped
@@ -45,6 +47,9 @@ class UserServiceImpl(
     @Inject
     @field:Default
     private lateinit var dobService: DoBService
+
+    @ConfigProperty(name = "temp.password.expire.time", defaultValue = "5")
+    private lateinit var tempExpirePass: String
 
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -96,6 +101,7 @@ class UserServiceImpl(
         val passwordCredential = Credentials().apply {
             this.user = ent
             this.password = passwordUtils.hashPassword(tmpPassword)
+            this.expiresIn = LocalDateTime.now().plusMinutes(tempExpirePass.toLong())
         }
         passwordCredential.persistAndFlush()
 
@@ -296,6 +302,7 @@ class UserServiceImpl(
 
             tmpPassword = passwordUtils.generateTemporaryPassword(10)
             user.password?.password = passwordUtils.hashPassword(tmpPassword!!)
+            user.password?.expiresIn = LocalDateTime.now().plusMinutes(tempExpirePass.toLong())
             user.fcp = true
 
             repo.entityManager.merge(user)
@@ -360,14 +367,25 @@ class UserServiceImpl(
         var email = ""
 
         return runCatching {
-            if (user?.firstLogin!!) {
+            if (user.firstLogin!!) {
                 user.firstLogin = false
                 user.status = Status.VERIFIED
             }
 
-            user.password?.password = dto.newPassword?.let { passwordUtils.hashPassword(it) }
-            user.fcp = false
+            if (user.fcp) {
+                val isExpired = LocalDateTime.now() >= user.password!!.expiresIn
+                if (isExpired) {
+                    return UserResponse(data).apply {
+                        this.code = ResponseMessage.FAIL.code
+                        this.systemCode = ResponseMessage.FAIL.code
+                        this.message = ResponseMessage.FAIL.message
+                        this.systemMessage = "Temporary Password Expired. Please reset Password"
+                    }
+                }
+                user.fcp = false
+            }
 
+            user.password?.password = dto.newPassword?.let { passwordUtils.hashPassword(it) }
             repo.entityManager.merge(user)
             modelMapper.map(user, UserDTO::class.java)
         }.fold(
