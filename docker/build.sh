@@ -18,6 +18,6 @@ docker rmi $to_push -f
 DOCKER_BUILDKIT=1 docker buildx build --platform linux/amd64 -f docker/Dockerfile -t $image .
 docker image tag $image $to_push
 
-docker login -u $userName -p $password
+docker login -u $userName -p
 docker image push $to_push
 docker logout $userName
