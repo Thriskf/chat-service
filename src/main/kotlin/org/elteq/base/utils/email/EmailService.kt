@@ -4,37 +4,32 @@ package org.elteq.base.utils.email
 import io.quarkus.mailer.Mail
 import io.quarkus.mailer.Mailer
 import io.quarkus.mailer.reactive.ReactiveMailer
+import io.quarkus.qute.TemplateInstance
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import jakarta.validation.Valid
-import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 
 @ApplicationScoped
-class EmailService {
+class EmailService(
+    @Inject var mailer: Mailer,
+    @Inject var reactiveMailer: ReactiveMailer,
+) {
     //    public Mailer mailer;
     //    @Inject
     //    public EmailService(Mailer mailer) {
     //        this.mailer = mailer;
     //    }
-    @Inject
-    private lateinit var mailer: Mailer
 
-    @Inject
-    private lateinit var reactiveMailer: ReactiveMailer
-
-    @ConfigProperty(name = "quarkus.mailer.username")
-    private lateinit var username: String
 
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
-    fun sendTextEmail(@Valid dto: EmailDTO) {
+    fun sendTextMail(@Valid dto: EmailDTO) {
         logger.info("about to send text email")
         runCatching {
             val mail = Mail.withText(dto.recipientEmail, dto.subject, dto.body)
-//                .setFrom(username)
             mailer.send(
                 mail
             )
@@ -49,15 +44,14 @@ class EmailService {
 
     }
 
-    fun sendHtmlEmail(@Valid dto: EmailDTO) {
+    fun sendHtmlMail(@Valid dto: EmailDTO, htmlMail: TemplateInstance) {
         logger.info("about to send html email")
-        val htmlContent = EmailTemplates.welcome(dto.recipientEmail!!).render()
         runCatching {
             mailer.send(
                 Mail.withHtml(
                     dto.recipientName,
-                    "Welcome to Our App!",
-                    htmlContent
+                    dto.subject,
+                    htmlMail.render()
                 )
             )
         }.fold(

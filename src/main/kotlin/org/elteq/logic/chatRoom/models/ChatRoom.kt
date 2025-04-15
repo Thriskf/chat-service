@@ -17,9 +17,9 @@ import java.time.LocalDateTime
 @Table(
     name = "tbl_chat room",
     indexes = [
-        Index(name = "index_name", columnList = "name"),
-        Index(name = "index_type", columnList = "type"),
-        Index(name = "idx_deleted", columnList = "deleted")
+        Index(name = "idx_ChatRoom__name", columnList = "name"),
+        Index(name = "idx_ChatRoom_type", columnList = "type"),
+        Index(name = "idx_ChatRoom_deleted", columnList = "deleted")
     ]
 )
 class ChatRoom : PanacheEntityBase(), Serializable {

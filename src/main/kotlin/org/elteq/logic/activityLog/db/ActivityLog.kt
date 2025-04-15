@@ -58,6 +58,9 @@ class ActivityLog : PanacheEntityBase(), Serializable {
     @Column(name = "created_on")
     var createdOn: LocalDateTime? = null
 
+    @Column(name="deleted")
+    var deleted:Boolean = false
+
     @UpdateTimestamp
     @Column(name = "updated_on")
     var updatedOn: LocalDateTime? = null

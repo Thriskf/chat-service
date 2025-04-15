@@ -13,6 +13,7 @@ import org.elteq.base.utils.MapperUtil.Mapper
 import org.elteq.base.utils.PasswordUtils
 import org.elteq.base.utils.email.EmailDTO
 import org.elteq.base.utils.email.EmailService
+import org.elteq.base.utils.email.EmailTemplates
 import org.elteq.logic.auth.dtos.UserChangePasswordDTO
 import org.elteq.logic.auth.dtos.UserForgetPasswordDTO
 import org.elteq.logic.contacts.enums.ContactType
@@ -111,8 +112,11 @@ class UserServiceImpl(
         repo.persist(ent)
 
         runCatching {
-            val emailDto = EmailDTO(email.value, ent.firstName, "Signup Successful", tmpPassword)
-            emailService.sendTextEmail(emailDto)
+            val emailDto = EmailDTO(email.value, ent.firstName, "Signup Successful.", "")
+            val mail = EmailTemplates.signUp(ent.firstName!!, tmpPassword)
+            emailService.sendHtmlMail(emailDto, mail)
+
+
         }.fold(onSuccess = {
             logger.info("User signup email sent successfully ${email.value}")
         }, onFailure = {
@@ -323,8 +327,9 @@ class UserServiceImpl(
 
         if (userResetResult.isSuccess && tmpPassword != null) {
             runCatching {
-                val emailDto = EmailDTO(dto.email, userResetResult.getOrNull()?.firstName, "Password Reset Successful", tmpPassword!!)
-                emailService.sendTextEmail(emailDto)
+                val emailDto = EmailDTO(dto.email, userResetResult.getOrNull()?.firstName, "Password Reset Successful", "")
+                val mail = EmailTemplates.resetPassword(tmpPassword!!)
+                emailService.sendHtmlMail(emailDto, mail)
             }.fold(
                 onSuccess = {
                     logger
@@ -404,7 +409,9 @@ class UserServiceImpl(
                         subject = "Password Change Confirmation",
                         body = "Your password was successfully changed. If this wasn't you, please contact support immediately."
                     )
-                    emailService.sendTextEmail(emailDto)
+
+                    val mail = EmailTemplates.updatePassword(user.firstName!!)
+                    emailService.sendHtmlMail(emailDto, mail)
                 }.onSuccess {
                     logger.info("Password change confirmation email sent to $email")
                 }.onFailure {

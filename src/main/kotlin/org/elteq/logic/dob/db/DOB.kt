@@ -18,7 +18,7 @@ import java.time.Month
 @Table(
     name = "tbl_dob",
     indexes = [
-        Index(name = "index_user_id", columnList = "user_id" ),
+        Index(name = "idx_DOB_user_id", columnList = "user_id" ),
     ]
 )
 class DOB : PanacheEntityBase(), Serializable {
@@ -54,6 +54,9 @@ class DOB : PanacheEntityBase(), Serializable {
     @UpdateTimestamp
     @Column(name = "updated_on")
     var updatedOn: LocalDateTime? = null
+
+    @Column(name="deleted")
+    var deleted:Boolean = false
 
     override fun toString(): String {
         return "DOB(id=$id, day=$day, month=$month, year=$year, createdOn=$createdOn, updatedOn=$updatedOn)"
