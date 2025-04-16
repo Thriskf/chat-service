@@ -11,9 +11,9 @@ object EmailTemplates {
 //    fun updatePassword(name: String): TemplateInstance = throw NotImplementedError()
 //
 
-    @JvmStatic
-    external fun welcome(name: String): TemplateInstance
     //    @JvmStatic
+//    external fun welcome(name: String): TemplateInstance
+    @JvmStatic
     external fun resetPassword(password: String): TemplateInstance
 
     //    @JvmStatic
