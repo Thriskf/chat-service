@@ -13,7 +13,7 @@ import org.elteq.base.utils.MapperUtil.Mapper
 import org.elteq.base.utils.PasswordUtils
 import org.elteq.base.utils.email.EmailDTO
 import org.elteq.base.utils.email.EmailService
-import org.elteq.base.utils.email.EmailTemplates
+import org.elteq.base.utils.email.HtmlEmailTemplates
 import org.elteq.logic.auth.dtos.UserChangePasswordDTO
 import org.elteq.logic.auth.dtos.UserForgetPasswordDTO
 import org.elteq.logic.contacts.enums.ContactType
@@ -113,7 +113,7 @@ class UserServiceImpl(
 
         runCatching {
             val emailDto = EmailDTO(email.value, ent.firstName, "Signup Successful.", "")
-            val mail = EmailTemplates.signUp(ent.firstName!!, tmpPassword)
+            val mail = HtmlEmailTemplates.signUp(ent.firstName!!, tmpPassword)
             emailService.sendHtmlMail(emailDto, mail)
 
 
@@ -328,7 +328,7 @@ class UserServiceImpl(
         if (userResetResult.isSuccess && tmpPassword != null) {
             runCatching {
                 val emailDto = EmailDTO(dto.email, userResetResult.getOrNull()?.firstName, "Password Reset Successful", "")
-                val mail = EmailTemplates.resetPassword(tmpPassword!!)
+                val mail = HtmlEmailTemplates.resetPassword(tmpPassword!!)
                 emailService.sendHtmlMail(emailDto, mail)
             }.fold(
                 onSuccess = {
@@ -410,7 +410,7 @@ class UserServiceImpl(
                         body = "Your password was successfully changed. If this wasn't you, please contact support immediately."
                     )
 
-                    val mail = EmailTemplates.updatePassword(user.firstName!!)
+                    val mail = HtmlEmailTemplates.updatePassword(user.firstName!!)
                     emailService.sendHtmlMail(emailDto, mail)
                 }.onSuccess {
                     logger.info("Password change confirmation email sent to $email")
