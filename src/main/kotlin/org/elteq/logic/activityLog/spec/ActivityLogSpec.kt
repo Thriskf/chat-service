@@ -2,7 +2,7 @@ package org.elteq.logic.activityLog.spec
 
 import jakarta.ws.rs.QueryParam
 import lombok.Data
-import org.elteq.base.utils.PaginationDto
+import org.elteq.base.utils.queryUtils.PaginationDto
 
 
 @Data

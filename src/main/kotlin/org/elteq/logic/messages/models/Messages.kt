@@ -18,7 +18,7 @@ import java.time.LocalDateTime
 @Table(
     name = "tbl_messages",
     indexes = [
-        Index(name = "idx_deleted", columnList = "deleted"),
+        Index(name = "idx_Messages_deleted", columnList = "deleted"),
 //        Index(name = "index_doctor_msisdn", columnList = "phone_number", unique = true)
     ]
 )

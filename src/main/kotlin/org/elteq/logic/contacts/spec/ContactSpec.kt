@@ -2,9 +2,8 @@ package org.elteq.logic.contacts.spec
 
 import jakarta.ws.rs.QueryParam
 import lombok.Data
-import org.elteq.base.utils.PaginationDto
+import org.elteq.base.utils.queryUtils.PaginationDto
 import org.elteq.logic.contacts.enums.ContactType
-import java.time.LocalDateTime
 
 @Data
 class ContactSpec : PaginationDto() {

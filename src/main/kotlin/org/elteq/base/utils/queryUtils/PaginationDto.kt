@@ -1,11 +1,10 @@
-package org.elteq.base.utils
+package org.elteq.base.utils.queryUtils
 
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.PositiveOrZero
 import jakarta.ws.rs.DefaultValue
 import jakarta.ws.rs.QueryParam
-import org.hibernate.query.sqm.SortOrder
 import java.time.LocalDateTime
 
 abstract class PaginationDto {
@@ -27,14 +26,15 @@ abstract class PaginationDto {
     open var sortBy: String = "createdOn"
 
     @QueryParam("sortOrder")
-    @DefaultValue("DESCENDING")
-    open var sortOrder: SortOrder = SortOrder.DESCENDING
+    @DefaultValue("DESC")
+    open var sortOrder: SortOrder = SortOrder.DESC
 
     @QueryParam("from")
     var from: LocalDateTime? = null
 
     @QueryParam("deleted")
-    var deleted: Boolean? = false
+    @DefaultValue("false")
+    var deleted: Boolean = false
 
     @QueryParam("to")
     var to: LocalDateTime? = null

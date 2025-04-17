@@ -2,9 +2,8 @@ package org.elteq.logic.chatRoom.spec
 
 /**/import jakarta.ws.rs.QueryParam
 import lombok.Data
-import org.elteq.base.utils.PaginationDto
+import org.elteq.base.utils.queryUtils.PaginationDto
 import org.elteq.logic.chatRoom.enums.ChatRoomType
-import java.time.LocalDateTime
 
 @Data
 class ChatRoomSpec : PaginationDto() {

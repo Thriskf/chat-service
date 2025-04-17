@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 @Table(
     name = "tbl_users",
     indexes = [
-        Index(name = "idx_deleted", columnList = "deleted"),
+        Index(name = "idx_Users_deleted", columnList = "deleted"),
 //        Index(name = "index_doctor_msisdn", columnList = "phone_number", unique = true)
     ]
 )
@@ -33,6 +33,9 @@ class Users : PanacheEntityBase(), Serializable {
 
     @Column(name = "last_name", nullable = false)
     var lastName: String? = null
+
+//    @Column(name = "email", nullable = false,unique = true)
+//    var email: String? = null
 
     @Column(name = "other_name")
     var otherName: String? = null
@@ -59,6 +62,10 @@ class Users : PanacheEntityBase(), Serializable {
 //    @JoinColumn(name = "date_of_birth_id", referencedColumnName = "id") // Foreign key column
 //    var dateOfBirth: DOB? = null
 
+    @OneToOne(mappedBy = "user", cascade = [ALL], fetch = FetchType.EAGER, orphanRemoval = true)
+    @JoinColumn(name = "password_id", referencedColumnName = "id")
+    var password: Credentials? = null
+
     @Column(name = "gender")
     @Enumerated(EnumType.STRING)
     var gender: Gender? = null
@@ -70,6 +77,15 @@ class Users : PanacheEntityBase(), Serializable {
     @Column(name = "deleted")
     var deleted: Boolean = false
 
+    @Column(name = "force_change_password")
+    var fcp: Boolean = true
+
+    @Column(name = "first_login")
+    var firstLogin = true
+
+    @Column(name = "token_version")
+    var tokenVersion: Long = 0
+
     @CreationTimestamp
     @Column(name = "created_on")
     var createdOn: LocalDateTime? = null
@@ -77,11 +93,8 @@ class Users : PanacheEntityBase(), Serializable {
     @UpdateTimestamp
     @Column(name = "updated_on")
     var updatedOn: LocalDateTime? = null
-
     override fun toString(): String {
-        return "Users(createdOn=$createdOn, id=$id, firstName=$firstName, lastName=$lastName, otherName=$otherName, gender=$gender, " +
-                "status=$status, deleted=$deleted " +
-                "displayName=$displayName, updatedOn=$updatedOn, gender=$gender)"
+        return "Users(id=$id, firstName=$firstName, lastName=$lastName, otherName=$otherName, displayName=$displayName, gender=$gender, status=$status, deleted=$deleted, fcp=$fcp, firstLogin=$firstLogin, createdOn=$createdOn, updatedOn=$updatedOn)"
     }
 
 }

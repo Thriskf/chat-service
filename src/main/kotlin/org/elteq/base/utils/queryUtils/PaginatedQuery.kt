@@ -1,11 +1,10 @@
-package org.elteq.base.utils
+package org.elteq.base.utils.queryUtils
 
 import io.quarkus.hibernate.orm.panache.PanacheQuery
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase
 import io.quarkus.panache.common.Page
 import io.quarkus.panache.common.Sort
 import jakarta.enterprise.context.ApplicationScoped
-import org.hibernate.query.sqm.SortOrder
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -43,7 +42,7 @@ class PaginatedQuery {
 
         // Setup pagination and sorting.
         val page = Page.of(spec.page, spec.size)
-        val sort = if (spec.sortOrder == SortOrder.DESCENDING) Sort.descending(spec.sortBy) else Sort.ascending(spec.sortBy)
+        val sort = if (spec.sortOrder == SortOrder.DESC) Sort.descending(spec.sortBy) else Sort.ascending(spec.sortBy)
 
         // Return a paginated and optionally filtered query.
         return if (query.isEmpty()) {
@@ -53,7 +52,7 @@ class PaginatedQuery {
         }
     }
 
-      private fun buildQueryString(finalQueryParams: Map<String, Any>, operation: String): String {
+    private fun buildQueryString(finalQueryParams: Map<String, Any>, operation: String): String {
         val queryParts = mutableListOf<String>()
 
         finalQueryParams.forEach { (key, value) ->
@@ -62,10 +61,12 @@ class PaginatedQuery {
                     // Handle the 'from' (start date) filter
                     queryParts.add("createdOn >= :$key") // Replace dateColumn with the actual column name
                 }
+
                 "to" -> {
                     // Handle the 'to' (end date) filter
                     queryParts.add("createdOn <= :$key") // Replace dateColumn with the actual column name
                 }
+
                 else -> {
                     // Default filtering for other parameters
                     queryParts.add("$key = :$key")
@@ -117,6 +118,3 @@ class PaginatedQuery {
 //        return repository.find(query, sort, finalQueryParams).page(page)
 //    }
 //}
-
-
-

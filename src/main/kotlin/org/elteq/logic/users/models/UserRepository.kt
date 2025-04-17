@@ -3,7 +3,7 @@ package org.elteq.logic.users.models
 import io.quarkus.hibernate.orm.panache.PanacheQuery
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase
 import jakarta.enterprise.context.ApplicationScoped
-import org.elteq.base.utils.PaginatedQuery
+import org.elteq.base.utils.queryUtils.PaginatedQuery
 import org.elteq.logic.users.spec.UserSpec
 
 

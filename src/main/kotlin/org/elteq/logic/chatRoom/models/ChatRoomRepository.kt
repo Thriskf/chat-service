@@ -4,7 +4,7 @@ import io.quarkus.hibernate.orm.panache.PanacheQuery
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase
 import io.quarkus.panache.common.Sort
 import jakarta.enterprise.context.ApplicationScoped
-import org.elteq.base.utils.PaginatedQuery
+import org.elteq.base.utils.queryUtils.PaginatedQuery
 import org.elteq.logic.chatRoom.enums.ChatRoomType
 import org.elteq.logic.chatRoom.spec.ChatRoomSpec
 

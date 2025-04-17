@@ -5,34 +5,52 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.inject.Default
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
+import org.eclipse.microprofile.config.inject.ConfigProperty
+import org.elteq.base.apiResponse.domain.ResponseMessage
 import org.elteq.base.exception.ServiceException
 import org.elteq.base.utils.ExportUtil
 import org.elteq.base.utils.MapperUtil.Mapper
-import org.elteq.logic.contacts.models.Contact
+import org.elteq.base.utils.PasswordUtils
+import org.elteq.base.utils.email.EmailDTO
+import org.elteq.base.utils.email.EmailService
+import org.elteq.base.utils.email.HtmlEmailTemplates
+import org.elteq.logic.auth.dtos.UserChangePasswordDTO
+import org.elteq.logic.auth.dtos.UserForgetPasswordDTO
 import org.elteq.logic.contacts.enums.ContactType
+import org.elteq.logic.contacts.models.Contact
 import org.elteq.logic.contacts.service.ContactService
 import org.elteq.logic.dob.servcice.DoBService
+import org.elteq.logic.users.dtos.*
+import org.elteq.logic.users.enums.Status
+import org.elteq.logic.users.models.Credentials
 import org.elteq.logic.users.models.UserRepository
 import org.elteq.logic.users.models.Users
-import org.elteq.logic.users.dtos.*
 import org.elteq.logic.users.spec.UserSpec
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.time.LocalDateTime
 import java.util.stream.Collectors
 
 @ApplicationScoped
 //@Singleton
-class UserServiceImpl(@Inject var repo: UserRepository) : UserService {
+class UserServiceImpl(
+    @Inject var repo: UserRepository,
+    @Inject var emailService: EmailService,
+) : UserService {
     @Inject
     @field:Default
     private lateinit var contactService: ContactService
 
     private val modelMapper = Mapper.mapper
 
+    private val passwordUtils = PasswordUtils
 
     @Inject
     @field:Default
     private lateinit var dobService: DoBService
+
+    @ConfigProperty(name = "temp.password.expire.time", defaultValue = "5")
+    private lateinit var tempExpirePass: String
 
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -77,16 +95,39 @@ class UserServiceImpl(@Inject var repo: UserRepository) : UserService {
         email.value = dto.email!!
         email.user = ent
         contactSet.add(email)
-
-        logger.info("user contact $contactSet")
         ent.contacts = contactSet
 
+
+        val tmpPassword = passwordUtils.generateTemporaryPassword(10)
+        val passwordCredential = Credentials().apply {
+            this.user = ent
+            this.password = passwordUtils.hashPassword(tmpPassword)
+            this.expiresIn = LocalDateTime.now().plusMinutes(tempExpirePass.toLong())
+        }
+        passwordCredential.persistAndFlush()
+
+        ent.password = passwordCredential
+
+        logger.info("user contact $contactSet")
         repo.persist(ent)
+
+        runCatching {
+            val emailDto = EmailDTO(email.value, ent.firstName, "Signup Successful.", "")
+            val mail = HtmlEmailTemplates.signUp(ent.firstName!!, tmpPassword)
+            emailService.sendHtmlMail(emailDto, mail)
+
+
+        }.fold(onSuccess = {
+            logger.info("User signup email sent successfully ${email.value}")
+        }, onFailure = {
+            logger.error("error occurred while sending signup email", it)
+        })
         logger.info("User added: $ent")
         return ent
 
     }
 
+    @Transactional
     override fun getById(id: String): Users {
         return repo.findById(id) ?: throw ServiceException(-2, "User with id $id was not found")
     }
@@ -239,4 +280,175 @@ class UserServiceImpl(@Inject var repo: UserRepository) : UserService {
 
     }
 
+    @Transactional
+    override fun resetPassword(dto: UserForgetPasswordDTO): UserResponse {
+
+        val data = mutableListOf<UserDTO>()
+        var message = ResponseMessage.SUCCESS.message
+        var code = ResponseMessage.SUCCESS.code
+        var systemMessage = "Password reset successfully.New temporal password sent to email"
+        var systemCode = ResponseMessage.SUCCESS.code
+
+        logger.info("Reset User ${dto.email} password")
+        var tmpPassword: String? = null
+
+        val userResetResult = runCatching {
+            val user = dto.email?.let { getByContact(it) }
+
+            if (user == null) {
+                return UserResponse(data).apply {
+                    this.code = ResponseMessage.FAIL.code
+                    this.systemCode = ResponseMessage.FAIL.code
+                    this.message = ResponseMessage.FAIL.message
+                    this.systemMessage = "User Not Found"
+                }
+            }
+
+            tmpPassword = passwordUtils.generateTemporaryPassword(10)
+            user.password?.password = passwordUtils.hashPassword(tmpPassword!!)
+            user.password?.expiresIn = LocalDateTime.now().plusMinutes(tempExpirePass.toLong())
+            user.fcp = true
+
+            repo.entityManager.merge(user)
+        }
+
+        userResetResult.fold(
+            onSuccess = {
+                logger.info("User password reset successful for ${dto.email}")
+            },
+            onFailure = {
+                logger.error("Password reset failed for ${dto.email}", it)
+                message = ResponseMessage.FAIL.message
+                code = ResponseMessage.FAIL.code
+                systemMessage = "Could not reset password"
+                systemCode = ResponseMessage.FAIL.code
+            }
+        )
+
+        if (userResetResult.isSuccess && tmpPassword != null) {
+            runCatching {
+                val emailDto = EmailDTO(dto.email, userResetResult.getOrNull()?.firstName, "Password Reset Successful", "")
+                val mail = HtmlEmailTemplates.resetPassword(tmpPassword!!)
+                emailService.sendHtmlMail(emailDto, mail)
+            }.fold(
+                onSuccess = {
+                    logger
+                        .info("Password reset email sent to ${dto.email}")
+                },
+                onFailure = {
+                    logger.error("Failed to send password reset email to ${dto.email}", it)
+                }
+            )
+        }
+
+        val response = UserResponse(data)
+        response.code = code
+        response.systemCode = systemCode
+        response.message = message
+        response.systemMessage = systemMessage
+        return response
+
+    }
+
+    @Transactional
+    override fun updatePassword(dto: UserChangePasswordDTO): UserResponse {
+        logger.info("Updating user password for ${dto.userId}")
+
+        val data = mutableListOf<UserDTO>()
+
+        val user = dto.userId?.let { getById(it) }
+
+        val verified = verifyPassword(dto.currentPassword!!, user?.password?.password!!)
+
+        if (!verified) {
+            return UserResponse(data).apply {
+                this.code = ResponseMessage.FAIL.code
+                this.systemCode = ResponseMessage.FAIL.code
+                this.message = ResponseMessage.FAIL.message
+                this.systemMessage = "Password mismatch"
+            }
+        }
+
+        var email = ""
+
+        return runCatching {
+            if (user.firstLogin!!) {
+                user.firstLogin = false
+                user.status = Status.VERIFIED
+            }
+
+            if (user.fcp) {
+                val isExpired = LocalDateTime.now() >= user.password!!.expiresIn
+                if (isExpired) {
+                    return UserResponse(data).apply {
+                        this.code = ResponseMessage.FAIL.code
+                        this.systemCode = ResponseMessage.FAIL.code
+                        this.message = ResponseMessage.FAIL.message
+                        this.systemMessage = "Temporary Password Expired. Please reset Password"
+                    }
+                }
+                user.fcp = false
+            }
+
+            user.password?.password = dto.newPassword?.let { passwordUtils.hashPassword(it) }
+            repo.entityManager.merge(user)
+            modelMapper.map(user, UserDTO::class.java)
+        }.fold(
+            onSuccess = { dto ->
+                data.add(dto)
+
+                // Send email
+                runCatching {
+                    email = user?.contacts
+                        ?.firstOrNull { it.type == ContactType.EMAIL }
+                        ?.value.toString()
+
+                    val emailDto = EmailDTO(
+                        recipientName = user?.firstName,
+                        recipientEmail = email,
+                        subject = "Password Change Confirmation",
+                        body = "Your password was successfully changed. If this wasn't you, please contact support immediately."
+                    )
+
+                    val mail = HtmlEmailTemplates.updatePassword(user.firstName!!)
+                    emailService.sendHtmlMail(emailDto, mail)
+                }.onSuccess {
+                    logger.info("Password change confirmation email sent to $email")
+                }.onFailure {
+                    logger.error("Failed to send password change confirmation email", it)
+                }
+
+
+                UserResponse(data).apply {
+                    this.code = ResponseMessage.SUCCESS.code
+                    this.systemCode = ResponseMessage.SUCCESS.code
+                    this.message = ResponseMessage.SUCCESS.message
+                    this.systemMessage = "Password Changed successfully"
+                }
+            },
+            onFailure = {
+                logger.error("Unable to change password", it)
+                UserResponse(data).apply {
+                    this.code = ResponseMessage.FAIL.code
+                    this.systemCode = ResponseMessage.FAIL.code
+                    this.message = ResponseMessage.FAIL.message
+                    this.systemMessage = "Could not change password"
+                }
+            }
+        )
+
+    }
+
+    override fun verifyPassword(password: String, hashedPassword: String): Boolean {
+        return runCatching {
+            passwordUtils.hashPassword(password)
+        }.fold(
+            onSuccess = {
+                it == hashedPassword
+            }, onFailure = {
+                logger.warn("Could not verify password", it)
+                false
+            }
+        )
+    }
 }

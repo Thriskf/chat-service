@@ -1,0 +1,84 @@
+# syntax=docker/dockerfile:1
+
+################################################################################
+# Multi-stage Dockerfile for building and running a Quarkus Java application
+#
+# Stage 1: Dependency resolution
+# Stage 2: Application build
+# Stage 3: Lean runtime environment
+#
+# For reference: https://docs.docker.com/go/dockerfile-reference/
+################################################################################
+
+# ------------------------------------------------------------------------------
+# Stage 1: Dependency Resolution - Download all dependencies first for caching
+# ------------------------------------------------------------------------------
+FROM eclipse-temurin:21-jdk-jammy AS deps
+
+# Set working directory
+WORKDIR /build
+
+# Copy build configuration files
+COPY --chmod=0755 mvnw .
+COPY .mvn .mvn
+COPY pom.xml .
+
+# Download dependencies (cached in /root/.m2)
+RUN --mount=type=cache,target=/root/.m2 \
+    ./mvnw dependency:go-offline -DskipTests
+
+# ------------------------------------------------------------------------------
+# Stage 2: Application Build - Compile code and build JAR
+# ------------------------------------------------------------------------------
+FROM deps AS build
+
+# Copy application source code
+COPY src src
+COPY src/main/resources/prod-application.properties src/main/resources/application.properties
+
+# Set build arguments with default values
+ARG ARTIFACT_ID=chat-service
+ARG VERSION=1.0.0-SNAPSHOT
+ARG JAR_NAME=${ARTIFACT_ID}-${VERSION}-runner.jar
+
+# Build application and rename JAR for simplicity
+RUN --mount=type=cache,target=/root/.m2 \
+    ./mvnw clean package -DskipTests -Dquarkus.package.jar.type=uber-jar && \
+    mv target/${JAR_NAME} target/app.jar
+
+# ------------------------------------------------------------------------------
+# Stage 3: Runtime - Create minimal production image
+# ------------------------------------------------------------------------------
+FROM eclipse-temurin:21-jre-jammy AS runtime
+
+# Application metadata
+LABEL maintainer="thrisk.f@gmail.com"
+LABEL description="Chat Service Application"
+
+# Security: Run as non-root user
+ARG APP_UID=10001
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --no-create-home \
+    --uid "${APP_UID}" \
+    appuser
+
+# Copy the built JAR from previous stage
+COPY --from=build --chown=appuser /build/target/app.jar /app/app.jar
+WORKDIR /app
+
+# Switch to non-root user
+USER appuser
+
+# Expose application port
+EXPOSE 8050
+
+# Health check configuration
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s \
+    CMD curl -f http://localhost:8050/health || exit 1
+
+# Runtime command (use exec form for better signal handling)
+ENTRYPOINT ["java", "-jar", "app.jar"]

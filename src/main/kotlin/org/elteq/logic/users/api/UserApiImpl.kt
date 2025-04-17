@@ -9,8 +9,11 @@ import org.elteq.base.apiResponse.wrapFailureInResponse
 import org.elteq.base.apiResponse.wrapInSuccessResponse
 import org.elteq.base.exception.ServiceException
 import org.elteq.base.utils.MapperUtil.Mapper
+import org.elteq.logic.users.dtos.UserDTO
+import org.elteq.logic.users.dtos.UserUpdateContactDTO
+import org.elteq.logic.users.dtos.UserUpdateNameDTO
+import org.elteq.logic.users.dtos.UserUpdateStatusDTO
 import org.elteq.logic.users.models.Users
-import org.elteq.logic.users.dtos.*
 import org.elteq.logic.users.service.UserService
 import org.elteq.logic.users.spec.UserSpec
 import org.slf4j.Logger
@@ -24,25 +27,6 @@ class UserApiImpl(@Inject var service: UserService) : UserApi {
 
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
     private val modelMapper = Mapper.mapper
-
-    override fun add(dto: UserAddDTO): ApiResponse<UserDTO> {
-        logger.info("Adding new user: $dto")
-
-        return runCatching {
-            val ent = service.add(dto)
-            modelMapper.map(ent, UserDTO::class.java)
-        }.fold(
-            onSuccess = { dto ->
-                val response = wrapInSuccessResponse(dto)
-                logger.info("Added new user response message: ${response.message}")
-                response
-            },
-            onFailure = { e ->
-                logger.error("Failed to add new user", e)
-                wrapFailureInResponse("Could not add new user. ${e.message}")
-            }
-        )
-    }
 
 
     override fun updateName(dto: UserUpdateNameDTO): ApiResponse<UserDTO> {
