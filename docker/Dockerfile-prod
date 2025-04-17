@@ -43,7 +43,7 @@ ARG JAR_NAME=${ARTIFACT_ID}-${VERSION}-runner.jar
 
 # Build application and rename JAR for simplicity
 RUN --mount=type=cache,target=/root/.m2 \
-    ./mvnw clean package -DskipTests -Dquarkus.package.type=uber-jar && \
+    ./mvnw clean package -DskipTests -Dquarkus.package.jar.type=uber-jar && \
     mv target/${JAR_NAME} target/app.jar
 
 # ------------------------------------------------------------------------------
