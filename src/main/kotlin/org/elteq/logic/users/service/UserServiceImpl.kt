@@ -42,7 +42,6 @@ class UserServiceImpl(
     private lateinit var contactService: ContactService
 
     private val modelMapper = Mapper.mapper
-
     private val passwordUtils = PasswordUtils
 
     @Inject
@@ -65,7 +64,6 @@ class UserServiceImpl(
                 "User already exist with phoneNumber :: ${dto.phoneNumber} or email :: ${dto.email}"
             )
         }
-
 
         val ent = Users().apply {
             firstName = dto.firstName
@@ -96,7 +94,6 @@ class UserServiceImpl(
         email.user = ent
         contactSet.add(email)
         ent.contacts = contactSet
-
 
         val tmpPassword = passwordUtils.generateTemporaryPassword(10)
         val passwordCredential = Credentials().apply {
@@ -286,7 +283,7 @@ class UserServiceImpl(
         val data = mutableListOf<UserDTO>()
         var message = ResponseMessage.SUCCESS.message
         var code = ResponseMessage.SUCCESS.code
-        var systemMessage = "Password reset successfully.New temporal password sent to email"
+        var systemMessage = "Password reset successfully. New temporal password sent to email"
         var systemCode = ResponseMessage.SUCCESS.code
 
         logger.info("Reset User ${dto.email} password")

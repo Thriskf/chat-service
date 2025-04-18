@@ -10,6 +10,7 @@ import jakarta.inject.Inject
 import jakarta.validation.Valid
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.util.concurrent.CompletableFuture
 
 
 @ApplicationScoped
@@ -27,40 +28,42 @@ class EmailService(
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     fun sendTextMail(@Valid dto: EmailDTO) {
-        logger.info("about to send text email")
-        runCatching {
-            val mail = Mail.withText(dto.recipientEmail, dto.subject, dto.body)
-            mailer.send(
-                mail
+        CompletableFuture.runAsync {
+            logger.info("about to send text email")
+            runCatching {
+                val mail = Mail.withText(dto.recipientEmail, dto.subject, dto.body)
+                mailer.send(
+                    mail
+                )
+            }.fold(
+                onSuccess = {
+                    logger.info("Text email sent successfully to :: ${dto.recipientEmail}")
+                },
+                onFailure = {
+                    logger.error("Error while sending text email to :: ${dto.recipientEmail}", it)
+                }
             )
-        }.fold(
-            onSuccess = {
-                logger.info("Text email sent successfully to :: ${dto.recipientEmail}")
-            },
-            onFailure = {
-                logger.error("Error while sending text email to :: ${dto.recipientEmail}", it)
-            }
-        )
-
+        }
     }
 
     fun sendHtmlMail(@Valid dto: EmailDTO, htmlMail: TemplateInstance) {
         logger.info("about to send html email")
-        runCatching {
-            mailer.send(
-                Mail.withHtml(
-                    dto.recipientName,
-                    dto.subject,
-                    htmlMail.render()
+        CompletableFuture.runAsync {
+            runCatching {
+                mailer.send(
+                    Mail.withHtml(
+                        dto.recipientName,
+                        dto.subject,
+                        htmlMail.render()
+                    )
                 )
-            )
-        }.fold(
-            onSuccess = {
-                logger.info("Html email sent successfully to :: ${dto.recipientEmail}")
-            }, onFailure = {
-                logger.error("Error while sending html email to :: ${dto.recipientEmail}", it)
-            })
-
+            }.fold(
+                onSuccess = {
+                    logger.info("Html email sent successfully to :: ${dto.recipientEmail}")
+                }, onFailure = {
+                    logger.error("Error while sending html email to :: ${dto.recipientEmail}", it)
+                })
+        }
     }
 
 
