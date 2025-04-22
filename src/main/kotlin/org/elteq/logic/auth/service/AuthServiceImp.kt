@@ -102,14 +102,20 @@ class AuthServiceImp(
             jwtUtils.revokeAccessToken(token)
         }.fold(
             onSuccess = {
-                LogOutResponse("Success").apply {
-                    this.status = it
+                LogOutResponse(it).apply {
+                    this.message = "Success"
+                    this.code = ResponseMessage.SUCCESS.code
+                    this.systemCode = ResponseMessage.SUCCESS.code
+                    this.systemMessage = "Logout Successful"
                 }
             },
             onFailure = {
                 logger.error("Log out failed", it)
-                LogOutResponse("Failed").apply {
-                    this.status = false
+                LogOutResponse(false).apply {
+                    this.message = "Failed"
+                    this.code = ResponseMessage.FAIL.code
+                    this.systemCode = ResponseMessage.SUCCESS.code
+                    this.systemMessage = "Logout Failed"
                 }
             }
         )

@@ -5,10 +5,7 @@ import jakarta.validation.Valid
 import org.elteq.base.apiResponse.domain.ApiResponse
 import org.elteq.logic.auth.dtos.*
 import org.elteq.logic.auth.service.AuthService
-import org.elteq.logic.users.dtos.UserAddDTO
-import org.elteq.logic.users.dtos.UserDTO
-import org.elteq.logic.users.dtos.UserLoginResponse
-import org.elteq.logic.users.dtos.UserResponse
+import org.elteq.logic.users.dtos.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 

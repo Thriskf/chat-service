@@ -9,10 +9,7 @@ import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement
 import org.eclipse.microprofile.openapi.annotations.tags.Tag
 import org.elteq.base.apiResponse.domain.ApiResponse
 import org.elteq.logic.auth.dtos.*
-import org.elteq.logic.users.dtos.UserAddDTO
-import org.elteq.logic.users.dtos.UserDTO
-import org.elteq.logic.users.dtos.UserLoginResponse
-import org.elteq.logic.users.dtos.UserResponse
+import org.elteq.logic.users.dtos.*
 
 @Authenticated
 @Consumes(MediaType.APPLICATION_JSON)

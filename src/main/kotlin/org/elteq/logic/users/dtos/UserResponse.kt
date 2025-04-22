@@ -24,3 +24,8 @@ class LoginResponse(data: UserDTO?) {
     var refreshTokenExpiresIn: Long? = null
 
 }
+
+
+class LogOutResponse(status: Boolean) : BaseResponse() {
+    val status: Boolean = status
+}
