@@ -22,7 +22,7 @@ class EmailService(
 
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
-    fun sendTextMail(@Valid dto: EmailDTO) {
+    fun textMail(@Valid dto: EmailDTO) {
             logger.info("about to send text email")
             runCatching {
                 val mail = Mail.withText(dto.recipientEmail, dto.subject, dto.body)
@@ -40,25 +40,8 @@ class EmailService(
 
     }
 
-    fun sendHtmlMail1(@Valid dto: EmailDTO, htmlContent: TemplateInstance) {
-            logger.info("Starting html mail process")
-            runCatching {
-                val mail = Mail.withHtml(
-                    dto.recipientEmail,
-                    dto.subject,
-                    htmlContent.render()
-                )
-                mailer.send(mail)
-            }.fold(
-                onSuccess = {
-                    logger.info("Html email sent successfully to :: ${dto.recipientEmail}")
-                }, onFailure = {
-                    logger.error("Error while sending html email to :: ${dto.recipientEmail}", it)
-                })
 
-    }
-
-    fun sendHtmlMail2(@Valid dto: EmailDTO, htmlMail: TemplateInstance) {
+    fun htmlMail(@Valid dto: EmailDTO, htmlMail: TemplateInstance) {
         logger.info("about to send html email")
         CompletableFuture.runAsync {
             runCatching {
@@ -81,8 +64,23 @@ class EmailService(
         }
     }
 
+    fun reactiveTextMail(@Valid dto: EmailDTO): Uni<Void> {
+        logger.info("about to send text mail - ")
+        return Uni.createFrom().item {
+            Mail.withText(dto.recipientEmail, dto.subject, dto.body)
+        }.onItem().transformToUni { text ->
+            logger.info("sending txt mail")
+            reactiveMailer.send(text)
+        }.onItem().invoke { ->
+            logger.info("text Email sent successfully to ${dto.recipientEmail}")
+        }.onFailure().invoke { e ->
+            logger.error("text mail send failed - ${dto.recipientEmail}", e)
+        }
+
+    }
+
     // send reactive email
-    fun sendHtmlMail(dto: EmailDTO, htmlMail: TemplateInstance): Uni<Void> {
+    fun reactiveHtmlMail(dto: EmailDTO, htmlMail: TemplateInstance): Uni<Void> {
         logger.info("about to send html email - ")
         return Uni.createFrom().item {
             htmlMail.render()
@@ -99,23 +97,3 @@ class EmailService(
     }
 
 }
-
-
-//class TryEmail {
-//    @Inject
-//    var emailService: base.EmailService? = null
-//
-//    private val logger: Logger = LoggerFactory.getLogger(TryEmail::class.java)
-//
-//    private fun send() {
-//        val dto: EmailDTO = EmailDTO("", "", "")
-//        emailService.sendEmail(dto).subscribe().with(
-//            { success ->
-//                logger.info("Email sent successfully (reactive).")
-//            },
-//            { failure ->
-//                logger.error("Failed to send email (reactive): {}", failure.getMessage())
-//            }
-//        )
-//    }
-//}

@@ -14,7 +14,6 @@ import org.elteq.base.utils.MapperUtil.Mapper
 import org.elteq.base.utils.PasswordUtils
 import org.elteq.base.utils.email.EmailDTO
 import org.elteq.base.utils.email.EmailService
-import org.elteq.base.utils.email.HtmlEmailTemplates
 import org.elteq.logic.auth.dtos.UserChangePasswordDTO
 import org.elteq.logic.auth.dtos.UserForgetPasswordDTO
 import org.elteq.logic.contacts.enums.ContactType
@@ -99,6 +98,9 @@ class UserServiceImpl(
         ent.contacts = contactSet
 
         val tmpPassword = passwordUtils.generateTemporaryPassword(10)
+
+        logger.info("PASSWORD PASSWORD PASSWORD $tmpPassword")
+
         val passwordCredential = Credentials().apply {
             this.user = ent
             this.password = passwordUtils.hashPassword(tmpPassword)
@@ -114,10 +116,10 @@ class UserServiceImpl(
         managedExecutor.runAsync {
 
         runCatching {
-            val emailDto = EmailDTO(email.value, ent.firstName, "Signup Successful.", "")
-            val mail = HtmlEmailTemplates.signUp(ent.firstName!!, tmpPassword)
+            val emailDto = EmailDTO(email.value, ent.firstName, "Signup Successful.", tmpPassword)
+//            val mail = HtmlEmailTemplates.signUp(ent.firstName!!, tmpPassword)
 //            emailService.sendHtmlMail(emailDto, mail)
-            emailService.sendTextMail(emailDto)
+            emailService.reactiveTextMail(emailDto)
 
         }.fold(onSuccess = {
             logger.info("User signup email sent successfully ${email.value}")
@@ -330,12 +332,13 @@ class UserServiceImpl(
         )
 
         if (userResetResult.isSuccess && tmpPassword != null) {
+            logger.info("PASSWORD PASSWORD PASSWORD $tmpPassword")
             managedExecutor.runAsync {
                 runCatching {
-                    val emailDto = EmailDTO(dto.email, userResetResult.getOrNull()?.firstName, "Password Reset Successful", "")
-                    val mail = HtmlEmailTemplates.resetPassword(tmpPassword!!)
+                    val emailDto = EmailDTO(dto.email, userResetResult.getOrNull()?.firstName, "Password Reset Successful", tmpPassword!!)
+//                    val mail = HtmlEmailTemplates.resetPassword(tmpPassword!!)
 //                    emailService.sendHtmlMail(emailDto, mail)
-                    emailService.sendTextMail(emailDto)
+                    emailService.reactiveTextMail(emailDto)
 
                 }.fold(
                     onSuccess = {
@@ -347,7 +350,6 @@ class UserServiceImpl(
                     }
                 )
             }
-
         }
 
         val response = UserResponse(data)
@@ -420,9 +422,9 @@ class UserServiceImpl(
                             body = "Your password was successfully changed. If this wasn't you, please contact support immediately."
                         )
 
-                        val mail = HtmlEmailTemplates.updatePassword(user.firstName!!)
+//                        val mail = HtmlEmailTemplates.updatePassword(user.firstName!!)
 //                        emailService.sendHtmlMail(emailDto, mail)
-                        emailService.sendTextMail(emailDto)
+                        emailService.reactiveTextMail(emailDto)
 
                     }.onSuccess {
                         logger.info("Password change confirmation email sent to $email")
