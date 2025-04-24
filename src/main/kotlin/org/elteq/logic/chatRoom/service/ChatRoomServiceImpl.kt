@@ -238,15 +238,22 @@ class ChatRoomServiceImpl(@Inject var repo: ChatRoomRepository) : ChatRoomServic
         return room != null
     }
 
-    override fun removeGroupMember(dto: ChatRoomRMMemberDTO): ChatRoom {
+    override fun removeGroupMember(dto: ChatRoomAddMemberDTO): ChatRoom {
         logger.info("removing group member to chat room with payload: $dto")
-        val ent = getById(dto.id!!)
-        val user = userService.getByContact(dto.phoneNumber!!)
+        val ent = getById(dto.roomId!!)
+        dto.phoneNumbers?.parallelStream()?.forEach { contact ->
+            val user = userService.getByContact(contact)
+            val isUserInGroup = ent?.id?.let { user.id?.let { userId -> this.checkUserInGroup(userId, it) } }!!
 
-        ent?.users?.remove(user)
-        user.chatRooms?.remove(ent)
+            if (isUserInGroup) {
+                logger.warn("User ${user.id} is not in group. Skipping ....")
+            } else {
+                ent.users?.remove(user)
+                user.chatRooms?.remove(ent)
+            }
+        }
 
-        logger.info("Group member removed")
+        logger.info("Group members removed")
         repo.entityManager.merge(ent)
         return ent!!
     }

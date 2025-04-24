@@ -31,7 +31,7 @@ interface MessageApi {
     fun search(@BeanParam spec: MessageSpec): ApiResponse<List<MessageDTO>>
 
     @GET
-    @Path("/{userId}")
+    @Path("/user/{userId}")
     fun getByUser(@PathParam("userId") userId: String): ApiResponse<List<MessageDTO>>
 
     @DELETE

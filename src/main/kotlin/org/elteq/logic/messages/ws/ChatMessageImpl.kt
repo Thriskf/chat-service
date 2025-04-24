@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Consumer
 
 @ApplicationScoped
-@ServerEndpoint("/chat/{roomId}/{userId}")
+@ServerEndpoint("/api/v1/chat/{roomId}/{userId}")
 //@Transactional
 //@Blocking
 class ChatMessageImpl : ChatMessage {

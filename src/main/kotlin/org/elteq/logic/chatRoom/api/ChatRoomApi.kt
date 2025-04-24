@@ -60,7 +60,7 @@ interface ChatRoomApi {
 
     @PUT
     @Path("/remove-member")
-    fun removeGroupMember(dto: ChatRoomRMMemberDTO): ApiResponse<ChatRoomDTO>
+    fun removeGroupMember(dto: ChatRoomAddMemberDTO): ApiResponse<ChatRoomDTO>
 
     @Path("/change-name")
     fun changeGroupName(dto: ChatRoomChangeNameDTO): ApiResponse<ChatRoomDTO>

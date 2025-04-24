@@ -6,6 +6,7 @@ import jakarta.enterprise.inject.Default
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
 import org.eclipse.microprofile.config.inject.ConfigProperty
+import org.eclipse.microprofile.context.ManagedExecutor
 import org.elteq.base.apiResponse.domain.ResponseMessage
 import org.elteq.base.exception.ServiceException
 import org.elteq.base.utils.ExportUtil
@@ -36,7 +37,9 @@ import java.util.stream.Collectors
 class UserServiceImpl(
     @Inject var repo: UserRepository,
     @Inject var emailService: EmailService,
-) : UserService {
+    @Inject var managedExecutor: ManagedExecutor,
+
+    ) : UserService {
     @Inject
     @field:Default
     private lateinit var contactService: ContactService
@@ -108,17 +111,21 @@ class UserServiceImpl(
         logger.info("user contact $contactSet")
         repo.persist(ent)
 
+        managedExecutor.runAsync {
+
         runCatching {
             val emailDto = EmailDTO(email.value, ent.firstName, "Signup Successful.", "")
             val mail = HtmlEmailTemplates.signUp(ent.firstName!!, tmpPassword)
-            emailService.sendHtmlMail(emailDto, mail)
-
+//            emailService.sendHtmlMail(emailDto, mail)
+            emailService.sendTextMail(emailDto)
 
         }.fold(onSuccess = {
             logger.info("User signup email sent successfully ${email.value}")
         }, onFailure = {
             logger.error("error occurred while sending signup email", it)
         })
+        }
+
         logger.info("User added: $ent")
         return ent
 
@@ -323,19 +330,24 @@ class UserServiceImpl(
         )
 
         if (userResetResult.isSuccess && tmpPassword != null) {
-            runCatching {
-                val emailDto = EmailDTO(dto.email, userResetResult.getOrNull()?.firstName, "Password Reset Successful", "")
-                val mail = HtmlEmailTemplates.resetPassword(tmpPassword!!)
-                emailService.sendHtmlMail(emailDto, mail)
-            }.fold(
-                onSuccess = {
-                    logger
-                        .info("Password reset email sent to ${dto.email}")
-                },
-                onFailure = {
-                    logger.error("Failed to send password reset email to ${dto.email}", it)
-                }
-            )
+            managedExecutor.runAsync {
+                runCatching {
+                    val emailDto = EmailDTO(dto.email, userResetResult.getOrNull()?.firstName, "Password Reset Successful", "")
+                    val mail = HtmlEmailTemplates.resetPassword(tmpPassword!!)
+//                    emailService.sendHtmlMail(emailDto, mail)
+                    emailService.sendTextMail(emailDto)
+
+                }.fold(
+                    onSuccess = {
+                        logger
+                            .info("Password reset email sent to ${dto.email}")
+                    },
+                    onFailure = {
+                        logger.error("Failed to send password reset email to ${dto.email}", it)
+                    }
+                )
+            }
+
         }
 
         val response = UserResponse(data)
@@ -395,26 +407,29 @@ class UserServiceImpl(
                 data.add(dto)
 
                 // Send email
-                runCatching {
-                    email = user?.contacts
-                        ?.firstOrNull { it.type == ContactType.EMAIL }
-                        ?.value.toString()
+                managedExecutor.runAsync {
+                    runCatching {
+                        email = user?.contacts
+                            ?.firstOrNull { it.type == ContactType.EMAIL }
+                            ?.value.toString()
 
-                    val emailDto = EmailDTO(
-                        recipientName = user?.firstName,
-                        recipientEmail = email,
-                        subject = "Password Change Confirmation",
-                        body = "Your password was successfully changed. If this wasn't you, please contact support immediately."
-                    )
+                        val emailDto = EmailDTO(
+                            recipientName = user.firstName,
+                            recipientEmail = email,
+                            subject = "Password Change Confirmation",
+                            body = "Your password was successfully changed. If this wasn't you, please contact support immediately."
+                        )
 
-                    val mail = HtmlEmailTemplates.updatePassword(user.firstName!!)
-                    emailService.sendHtmlMail(emailDto, mail)
-                }.onSuccess {
-                    logger.info("Password change confirmation email sent to $email")
-                }.onFailure {
-                    logger.error("Failed to send password change confirmation email", it)
+                        val mail = HtmlEmailTemplates.updatePassword(user.firstName!!)
+//                        emailService.sendHtmlMail(emailDto, mail)
+                        emailService.sendTextMail(emailDto)
+
+                    }.onSuccess {
+                        logger.info("Password change confirmation email sent to $email")
+                    }.onFailure {
+                        logger.error("Failed to send password change confirmation email", it)
+                    }
                 }
-
 
                 UserResponse(data).apply {
                     this.code = ResponseMessage.SUCCESS.code

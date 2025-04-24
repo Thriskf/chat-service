@@ -5,7 +5,7 @@ name: dev-environment
 services:
 
   chat-service:
-    image: project/chat-service:latest
+    image: project-chat-service-test
     container_name: chat-service
     depends_on:
 #      zoo1:

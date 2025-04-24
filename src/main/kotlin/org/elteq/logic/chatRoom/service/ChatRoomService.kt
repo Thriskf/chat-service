@@ -21,7 +21,7 @@ interface ChatRoomService {
     fun getByName(name: String): PanacheQuery<ChatRoom>
     fun getByType(type: ChatRoomType): PanacheQuery<ChatRoom>
     fun addGroupMember(dto: ChatRoomAddMemberDTO): ChatRoom
-    fun removeGroupMember(dto: ChatRoomRMMemberDTO): ChatRoom
+    fun removeGroupMember(dto: ChatRoomAddMemberDTO): ChatRoom
     fun changeGroupName(dto: ChatRoomChangeNameDTO): ChatRoom
 
 }

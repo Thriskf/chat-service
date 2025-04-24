@@ -164,7 +164,7 @@ class ChatRoomApiImpl(@Inject var service: ChatRoomService) : ChatRoomApi {
         }
     }
 
-    override fun removeGroupMember(dto: ChatRoomRMMemberDTO): ApiResponse<ChatRoomDTO> {
+    override fun removeGroupMember(dto: ChatRoomAddMemberDTO): ApiResponse<ChatRoomDTO> {
         logger.info("remove group member with payload $dto")
         return try {
             val ent = service.removeGroupMember(dto)

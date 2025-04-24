@@ -34,7 +34,7 @@ FROM deps AS build
 
 # Copy application source code
 COPY src src
-COPY src/main/resources/application.properties src/main/resources/application.properties
+COPY src/main/resources/local-application.properties src/main/resources/application.properties
 
 # Set build arguments with default values
 ARG ARTIFACT_ID=chat-service
