@@ -1,76 +1,41 @@
-version: '3.8'
+name: chat-app
 
 services:
-
-  mariadb:
-    image: mariadb:latest
-    container_name: mariadb
-    restart: unless-stopped
-    ports:
-      - "8030:3306"
-    environment:
-      MARIADB_USER: chat_app
-      MARIADB_ROOT_PASSWORD: n3nmxwjiee@#%#&^@#463UK
-      MARIADB_PASSWORD: ybgfcnojcojh6737*^
-      MARIADB_DATABASE: elteq_user_service
-      MARIADB_INITDB_SKIP_TZINFO: 1
-      MARIADB_INITDB_WD: /docker-entrypoint-initdb.d
-
   backend:
-    image: nelieli/elteq:project-chat-service-latest
-    container_name: chat-app
-    depends_on:
-      mariadb:
-        condition: service_started
-    environment:
-      QUARKUS_DATASOURCE_JDBC_URL: jdbc:mariadb://mariadb:3306/elteq_user_service
-      QUARKUS_DATASOURCE_USERNAME: chat_app
-      QUARKUS_DATASOURCE_PASSWORD: ybgfcnojcojh6737*^
+    image: project-chat-service-test
+    container_name: chat-app-backend
+    networks:
+      - shared-network
+#    depends_on:
+#      dev-environment:mariadb:
+#        condition: service_started
+    #    environment:
+    #      QUARKUS_DATASOURCE_JDBC_URL: jdbc:mariadb://mariadb:3306/elteq_user_service
+    #      QUARKUS_DATASOURCE_USERNAME: chat_app
+    #      QUARKUS_DATASOURCE_PASSWORD: ybgfcnojcojh6737*^
     ports:
       - "8050:8050"
 
+  ui:
+    image: chat-ui
+    container_name: chat-app-ui
+    networks:
+      - shared-network
+    depends_on:
+      backend:
+        condition: service_started
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    environment:
+      - HOST=0.0.0.0
+      - PORT=5173
+    restart: unless-stopped
 
-#  keycloak:
-#    image: quay.io/keycloak/keycloak:24.0
-#    container_name: keycloak
-#    command: start-dev
-#    environment:
-#      KEYCLOAK_ADMIN: admin
-#      KEYCLOAK_ADMIN_PASSWORD: admin
-#      KC_DB: dev-mem
-#      KC_HTTP_PORT: 8080
-#    ports:
-#      - "8080:8080"
-
-#  backendBuildImage:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#    container_name: quarkus-backend
-#    depends_on:
-#      - mariadb
-#      - keycloak
-#    environment:
-#      QUARKUS_DATASOURCE_JDBC_URL: jdbc:mariadb://mariadb:3306/appdb
-#      QUARKUS_DATASOURCE_USERNAME: appuser
-#      QUARKUS_DATASOURCE_PASSWORD: apppass
-#      KEYCLOAK_URL: http://keycloak:8080
-#    ports:
-#      - "8081:8081"  # adjust to your app's exposed port
-
-#  mariadb:
-#    image: mariadb:10.5
-#    container_name: mariadb
-#    restart: unless-stopped
-#    environment:
-#      MYSQL_ROOT_PASSWORD: rootpass
-#      MYSQL_DATABASE: appdb
-#      MYSQL_USER: appuser
-#      MYSQL_PASSWORD: apppass
-#    volumes:
-#      - mariadb_data:/var/lib/mysql
-#    ports:
-#      - "3306:3306"
-
-volumes:
-  mariadb_data:
+networks:
+  shared-network:
+    name: project_shared_network
+    external: true
+    driver: bridge

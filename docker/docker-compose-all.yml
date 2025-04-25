@@ -3,31 +3,6 @@ name: dev-environment
 
 
 services:
-
-  chat-service:
-    image: project-chat-service-test
-    container_name: chat-service
-    depends_on:
-#      zoo1:
-#        condition: service_started
-#      zoo2:
-#        condition: service_started
-#      zoo3:
-#        condition: service_started
-      keycloak:
-        condition: service_started
-      mariadb:
-        condition: service_started
-#      rabbitmq:
-#        condition: service_started
-    ports:
-      - "8050:8050"
-#    network_mode: host
-  #    network_mode: bridge
-  #    networks:
-  #      - default-bridge-network
-
-
   phpmyadmin:
     image: phpmyadmin:latest
     container_name: dev-phpAdmin
@@ -70,6 +45,8 @@ services:
     image: mariadb:latest
     container_name: dev-maria
     restart: always
+    networks:
+      - shared-network
     ports:
       - "8030:3306"
     environment:
@@ -451,3 +428,8 @@ services:
 #
 #  default--host-network:
 #    driver: host
+
+networks:
+  shared-network:
+    name: project_shared_network
+    driver: bridge
