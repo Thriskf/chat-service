@@ -2,7 +2,7 @@ name: chat-app
 
 services:
   backend:
-    image: project-chat-service-test
+    image: project-chat-app-backend-test
     container_name: chat-app-backend
     networks:
       - shared-network
