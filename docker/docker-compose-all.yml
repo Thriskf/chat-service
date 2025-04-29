@@ -6,6 +6,8 @@ services:
   phpmyadmin:
     image: phpmyadmin:latest
     container_name: dev-phpAdmin
+    networks:
+      - shared-network
     restart: always
     ports:
       - "8010:80"
@@ -17,8 +19,11 @@ services:
       PMA_PASSWORD: password
 
   keycloak:
-    image: quay.io/keycloak/keycloak:latest
+#    image: quay.io/keycloak/keycloak:latest
+    image: quay.io/keycloak/keycloak:26.0.7
     container_name: dev-keycloak
+    networks:
+      - shared-network
     ports:
       - "8011:8080"
     depends_on:
