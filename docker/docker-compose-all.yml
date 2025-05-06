@@ -99,9 +99,6 @@ services:
       mysqldb:
         condition: service_started
 
-#    networks:
-#      - default-network
-
 
   jaeger:
     image: jaegertracing/jaeger:2.3.0
@@ -148,12 +145,51 @@ services:
   redis:
     image: redis:latest
     container_name: dev-redis
+    command: |
+      /bin/sh -c '
+        echo "user default off
+              user dev on >$${REDIS_PASSWORD} ~* +@all" > /etc/redis/users.acl &&
+        redis-server --aclfile /etc/redis/users.acl
+      '
+    environment:
+      - REDIS_PASSWORD=password
+    networks:
+      - shared-network
+    volumes:
+      - redis_data:/data
+      - ./redis-config:/etc/redis
     ports:
       - "6379:6379"
+  #    restart: unless-stopped
+
+  redis-ui:
+    image: redis/redisinsight:latest
+    container_name: dev-redis-ui
+    networks:
+      - shared-network
+    depends_on:
+      redis:
+        condition: service_started
+    ports:
+      - "8014:5540"
+    environment:
+      - REDIS_PASSWORD=password
+    volumes:
+      - redis_insight:/db
+  #    restart: unless-stopped
+
+  sms-export-consumer:
+    image: sms-export-consumer
+    container_name: sms-export-consumer
+    networks:
+      - shared-network
+
 
   rabbitmq:
     image: rabbitmq:3-management
     container_name: dev-rabbit
+    networks:
+      - shared-network
     ports:
       - "15672:15672"
       - "5672:5672"
@@ -161,14 +197,6 @@ services:
       RABBITMQ_DEFAULT_USER: dev
       RABBITMQ_DEFAULT_PASS: password
       RABBITMQ_DEFAULT_VHOST: dev-rabbit
-
-  redis-ui:
-    image: patrikx3/p3x-redis-ui:latest
-    container_name: dev-redis-ui
-    ports:
-      - "7843:7843"
-    volumes:
-      - /home/org.elteq.commons.user/p3x-redis-ui-settings:/settings
 
   zoo1:
     image: zookeeper
@@ -438,3 +466,7 @@ networks:
   shared-network:
     name: project_shared_network
     driver: bridge
+
+volumes:
+  redis_data:
+  redis_insight:
