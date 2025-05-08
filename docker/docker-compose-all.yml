@@ -336,6 +336,8 @@ services:
   kafka-controller-1:
     image: apache/kafka:latest
     container_name: kafka-controller-1
+    networks:
+      - shared-network
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: controller
@@ -348,6 +350,8 @@ services:
   kafka-controller-2:
     image: apache/kafka:latest
     container_name: kafka-controller-2
+    networks:
+      - shared-network
     environment:
       KAFKA_NODE_ID: 2
       KAFKA_PROCESS_ROLES: controller
@@ -360,6 +364,8 @@ services:
   kafka-controller-3:
     image: apache/kafka:latest
     container_name: kafka-controller-3
+    networks:
+      - shared-network
     environment:
       KAFKA_NODE_ID: 3
       KAFKA_PROCESS_ROLES: controller
@@ -372,6 +378,8 @@ services:
   kafka-broker-1:
     image: apache/kafka:latest
     container_name: kafka-broker-1
+    networks:
+      - shared-network
     ports:
       - 29092:9092
     environment:
@@ -392,6 +400,8 @@ services:
   kafka-broker-2:
     image: apache/kafka:latest
     container_name: kafka-broker-2
+    networks:
+      - shared-network
     ports:
       - 39092:9092
     environment:
@@ -412,6 +422,8 @@ services:
   kafka-broker-3:
     image: apache/kafka:latest
     container_name: kafka-broker-3
+    networks:
+      - shared-network
     ports:
       - 49092:9092
     environment:
